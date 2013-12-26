@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html class="no-js">
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		<title>Futurejs test</title>
+		<meta name="description" content="">
+		<meta name="viewport" content="width=device-width">
+		
+		<link rel="stylesheet" href="../node_modules/mocha/mocha.css" />
+		<script src="../node_modules/mocha/mocha.js"></script>
+		<script>mocha.setup('bdd')</script>
+		<script src="./assert.js"></script>
+		<script src="../future.js"></script>
+		
+		<script>
+			function require( s ){
+				switch(s){
+					case "assert":
+						return assert;
+					case "../future":
+						return { Future: Future, Completer: Completer };
+				}
+			}
+		</script>
+		
+		<script src="../test/test-future.js"></script>
+		</head>
+	<body>
+		<div id="mocha"></div>
+		 <script>
+			mocha.checkLeaks();
+			mocha.run();
+		  </script>
+	</body>
+</html>

@@ -1,6 +1,8 @@
 /**
- * Futurejs v0.1.0
+ * Futurejs v0.1.1
  * https://github.com/ertrzyiks/futurejs
+ *
+ * Dart Future and Completer features ported to javascript.
  */
 (function(){
 	
@@ -64,8 +66,6 @@
 				onError: onError,
 				f: future
 			} );
-			
-			return future;
 		}
 		else
 		{
@@ -81,10 +81,18 @@
 	
 	/**
 	 * @method catchError
+	 * @param onError {Function}
+	 * @param [test] {Function}
 	 */
-	
 	Future.prototype.catchError = function( onError, test ){
-		
+		return this.then( function(){}, function( e ){
+			if( !test || test( e ) )
+			{
+				return onError( e );
+			}
+			
+			throw e;
+		});
 	};
 	
 	/**

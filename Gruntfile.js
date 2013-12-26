@@ -1,11 +1,14 @@
 module.exports = function(grunt) {
 	grunt.initConfig({
 		pkg: grunt.file.readJSON('package.json'),
-		copy:{
+		replace:{
 			build: {
-				files: [
-					{ expand: true, src: ['future.js'], dest: 'dist/'}
-				]
+				src: ['future.js'],
+				dest: 'dist/future.js',
+				replacements: [{
+					from: '{{VERSION}}',
+					to: '<%= pkg.version %>'
+				}]
 			}
 		},
 		uglify: {
@@ -20,9 +23,9 @@ module.exports = function(grunt) {
 	});
 
 
-grunt.loadNpmTasks('grunt-contrib-copy');
+grunt.loadNpmTasks('grunt-text-replace');
 grunt.loadNpmTasks('grunt-contrib-uglify');
 
-grunt.registerTask('default', ['copy', 'uglify']);
+grunt.registerTask('default', ['replace', 'uglify']);
 
 };

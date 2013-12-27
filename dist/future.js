@@ -1,5 +1,5 @@
 /**
- * Futurejs v0.1.1
+ * Futurejs v0.1.2
  * https://github.com/ertrzyiks/futurejs
  *
  * Dart Future and Completer features ported to javascript.
@@ -54,7 +54,12 @@
 	Future.prototype.then = function( onValue, onError ){
 		if( !isFunction(onValue) )
 		{
-			throw new Error("Callback must be a function");
+			throw new Error("onValue callback must be a function");
+		}
+		
+		if( onError != null && !isUndefined(onError) && !isFunction(onError) )
+		{
+			throw new Error("onError callback must be a function");
 		}
 		
 		var future = new Future();
@@ -108,11 +113,7 @@
 		this._pending = false;
 		this._data = data;
 		
-		var len = this._callbacks.length
-		for( var i = 0; i < len; i++ )
-		{
-			this._innerComplete( this._callbacks[i] );
-		}
+		this._dispatchCompletion();
 	};
 	
 	/**
@@ -120,7 +121,7 @@
 	 * @private
 	 */
 	Future.prototype._innerComplete = function( data ){
-		var result = null;
+		var result;
 		try
 		{
 			if( this._withError )
@@ -142,6 +143,11 @@
 			return;
 		}
 		
+		if ( isUndefined(result) )
+		{
+			result = this._data;
+		}
+		
 		data.f._complete( result );
 	};
 	
@@ -159,7 +165,21 @@
 		this._withError = true;
 		this._error = error;
 		
-		var len = this._callbacks.length
+		this._dispatchCompletion();
+	};
+	
+	/**
+	 *
+	 */
+	Future.prototype._dispatchCompletion = function(){
+		var len = this._callbacks.length, 
+			errorHandled;
+		
+		if ( this._withError && len == 0 )
+		{
+			throw this._error;
+		}
+			
 		for( var i = 0; i < len; i++ )
 		{
 			this._innerComplete( this._callbacks[i] );
@@ -206,6 +226,10 @@
 		root.Completer = Completer;
 	}
 	
+	function isUndefined(obj)
+	{
+		return typeof(obj) == "undefined";
+	}
 	
 	function isFunction(obj) 
 	{

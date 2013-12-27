@@ -85,5 +85,4 @@ TODO
 ---
  - handle Future returned in `onValue` or `onError` callback
  - allow sync completion
- - implement missing method `whenComplete` (finally)
 

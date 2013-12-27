@@ -65,6 +65,14 @@ describe('Future', function(){
 				done();
 			});
 		});
+		
+		it('allow to check completion', function( ){
+			var completer = new Completer();
+			assert.strictEqual( false, completer.isCompleted() );
+			
+			completer.complete( 1 );
+			assert.strictEqual( true, completer.isCompleted() );
+		});
 	});
 	
 	describe('#future', function(){		
@@ -345,6 +353,45 @@ describe('Future', function(){
 				
 				completer.future.then(emptyFn, "siema");
 			});
+		});
+	});
+	
+	describe('#whenComplete', function(){
+		it('call action function on success', function( done ){
+			function asyncTask(){
+				var completer = new Completer();
+				
+				setTimeout(function(){
+					completer.complete( 1 );
+				}, 100);
+				
+				return completer.future;
+			}
+			
+			asyncTask()
+				.whenComplete(function(){
+					done();
+				});
+		});
+		
+		it('call action function on error', function(){
+			function asyncTask(){
+				var completer = new Completer();
+				
+				setTimeout(function(){
+					completer.completeError( new Error() );
+				}, 100);
+				
+				return completer.future;
+			}
+			
+			asyncTask()
+				.whenComplete(function(){
+					done();
+				})
+				.catchError(function(e){
+					
+				});
 		});
 	});
 })

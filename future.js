@@ -103,6 +103,23 @@
 	};
 	
 	/**
+	 * @method whenComplete
+	 * @param action {Function}
+	 */
+	Future.prototype.whenComplete = function( action ){
+		return this.then(
+			function( data ){
+				action();
+				return data;
+			}, 
+			function(e){
+				action();
+				throw e;
+			}
+		);
+	};
+	
+	/**
 	 * @method _complete
 	 * @private
 	 */
@@ -171,7 +188,8 @@
 	};
 	
 	/**
-	 *
+	 * @method _dispatchCompletion
+	 * @private
 	 */
 	Future.prototype._dispatchCompletion = function(){
 		var len = this._callbacks.length, 
@@ -215,6 +233,13 @@
 	 */
 	Completer.prototype.completeError = function( error ){
 		this.future._completeError( error );
+	};
+	
+	/**
+	 * @method isCompleted
+	 */
+	Completer.prototype.isCompleted = function(){
+		return !this.future._pending;
 	};
 	
 	

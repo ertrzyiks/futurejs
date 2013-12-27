@@ -256,6 +256,26 @@ describe('Future', function(){
 	});
 	
 	
+	describe('#future-sync', function(){		
+		it('allow to create sync futures with value', function( ){
+			new Future.value( 5 ).then(function( data ){
+				assert.strictEqual( 5, data );
+			});
+		});
+		
+		it('allow to create sync futures with function', function( ){
+			new Future.sync( function(){ return 5; } ).then(function( data ){
+				assert.strictEqual( 5, data );
+			});
+		});
+		
+		it('allow to create sync futures with error', function( ){
+			new Future.error( new Error() ).catchError(function( e ){
+				assert.strictEqual( true, e instanceof Error );
+			});
+		});
+	});
+	
 	describe('#future-error', function(){
 		it('throws uncatched errors', function( ){
 			var completer = new Completer();

@@ -9,12 +9,65 @@
 	var root = this;
 	
 	/**
-	 *	@class Future
-	 *	@constructor
+	 * @class Future
+	 * @constructor
+	 * @param value {Object, Function}
+	 * @param withError {boolean}
 	 */
-	var Future = function(){ 
+	var Future = function( value, withError ){ 
+		if ( !isUndefined( value ) )
+		{
+			var v;
+			if ( isFunction( value ) )
+			{
+				v = value();
+			}
+			else
+			{
+				v = value;
+			}
+			
+			this._pending = false;
+			if ( withError )
+			{
+				this._withError = true;
+				this._error = v;
+			}
+			else
+			{
+				this._data = v;
+			}
+		}
+		
 		this._callbacks = [];
 	};
+	
+	/**
+	 * @constructor
+	 * @param value {Object}
+	 */
+	Future.value = function( value )
+	{
+		return new Future( value );
+	}
+	
+	/**
+	 * @constructor
+	 * @param value {Function}
+	 */
+	Future.sync = function( value )
+	{
+		return new Future( value );
+	}
+	
+	/**
+	 * @constructor
+	 * @param value {Object, Function}
+	 */
+	Future.error = function( error )
+	{
+		return new Future( error, true );
+	}
 	
 	/**
 	 * @property _pending {boolean}

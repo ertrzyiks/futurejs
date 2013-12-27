@@ -84,5 +84,4 @@ loadData().then( function( rowsNum ){
 TODO
 ---
  - handle Future returned in `onValue` or `onError` callback
- - allow sync completion
 

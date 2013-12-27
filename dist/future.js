@@ -1,5 +1,5 @@
 /**
- * Futurejs v0.1.2
+ * Futurejs v0.1.3
  * https://github.com/ertrzyiks/futurejs
  *
  * Dart Future and Completer features ported to javascript.
@@ -9,12 +9,65 @@
 	var root = this;
 	
 	/**
-	 *	@class Future
-	 *	@constructor
+	 * @class Future
+	 * @constructor
+	 * @param value {Object, Function}
+	 * @param withError {boolean}
 	 */
-	var Future = function(){ 
+	var Future = function( value, withError ){ 
+		if ( !isUndefined( value ) )
+		{
+			var v;
+			if ( isFunction( value ) )
+			{
+				v = value();
+			}
+			else
+			{
+				v = value;
+			}
+			
+			this._pending = false;
+			if ( withError )
+			{
+				this._withError = true;
+				this._error = v;
+			}
+			else
+			{
+				this._data = v;
+			}
+		}
+		
 		this._callbacks = [];
 	};
+	
+	/**
+	 * @constructor
+	 * @param value {Object}
+	 */
+	Future.value = function( value )
+	{
+		return new Future( value );
+	}
+	
+	/**
+	 * @constructor
+	 * @param value {Function}
+	 */
+	Future.sync = function( value )
+	{
+		return new Future( value );
+	}
+	
+	/**
+	 * @constructor
+	 * @param value {Object, Function}
+	 */
+	Future.error = function( error )
+	{
+		return new Future( error, true );
+	}
 	
 	/**
 	 * @property _pending {boolean}
@@ -69,6 +122,7 @@
 			this._callbacks.push( { 
 				onValue: onValue,
 				onError: onError,
+				errorHandled: false,
 				f: future
 			} );
 		}
@@ -77,6 +131,7 @@
 			this._innerComplete( { 
 				onValue: onValue,
 				onError: onError,
+				errorHandled: false,
 				f: future
 			} );
 		}
@@ -98,6 +153,23 @@
 			
 			throw e;
 		});
+	};
+	
+	/**
+	 * @method whenComplete
+	 * @param action {Function}
+	 */
+	Future.prototype.whenComplete = function( action ){
+		return this.then(
+			function( data ){
+				action();
+				return data;
+			}, 
+			function(e){
+				action();
+				throw e;
+			}
+		);
 	};
 	
 	/**
@@ -169,7 +241,8 @@
 	};
 	
 	/**
-	 *
+	 * @method _dispatchCompletion
+	 * @private
 	 */
 	Future.prototype._dispatchCompletion = function(){
 		var len = this._callbacks.length, 
@@ -213,6 +286,13 @@
 	 */
 	Completer.prototype.completeError = function( error ){
 		this.future._completeError( error );
+	};
+	
+	/**
+	 * @method isCompleted
+	 */
+	Completer.prototype.isCompleted = function(){
+		return !this.future._pending;
 	};
 	
 	

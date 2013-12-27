@@ -5,23 +5,6 @@ var Future = require("../future").Future;
 
 function emptyFn(){}
 
-var _callback;
-
-function onGlobalError( cb )
-{
-	_callback = cb;
-}
-
-process.on('uncaughtException', function(err) { 
-	console.log(err);
-
-	if ( _callback )
-	{
-		_callback(err);
-		return false;
-	}
-});
-
 describe('Future', function(){
 	describe('#completer', function(){
 		it('inform future about completion with data', function( done ){

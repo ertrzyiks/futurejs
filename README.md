@@ -83,5 +83,8 @@ loadData().then( function( rowsNum ){
 
 TODO
 ---
- - handle Future returned in `onValue` or `onError` callback
+ - Future.wait() function
+ - Future.forEach() function
+ - Future.delayed() function
+ - clean callbacks array after completion
 

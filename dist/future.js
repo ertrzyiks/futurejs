@@ -1,5 +1,5 @@
 /**
- * Futurejs v0.1.3
+ * Futurejs v0.2.0
  * https://github.com/ertrzyiks/futurejs
  *
  * Dart Future and Completer features ported to javascript.
@@ -14,7 +14,8 @@
 	 * @param value {Object, Function}
 	 * @param withError {boolean}
 	 */
-	var Future = function( value, withError ){ 
+	var Future = function( value, withError )
+	{ 
 		if ( !isUndefined( value ) )
 		{
 			var v;
@@ -102,17 +103,26 @@
 	/**
 	 * @method then
 	 * @param onValue {Function}
-	 * @param [onError] {Function}
+	 * @param [options] {Object}
 	 */
-	Future.prototype.then = function( onValue, onError ){
+	Future.prototype.then = function( onValue, options )
+	{
 		if( !isFunction(onValue) )
 		{
 			throw new Error("onValue callback must be a function");
 		}
 		
+		var onError = options;
+		
 		if( onError != null && !isUndefined(onError) && !isFunction(onError) )
 		{
-			throw new Error("onError callback must be a function");
+			options = options || {};
+			onError = options.onError;
+			
+			if( !isFunction(onError) )
+			{
+				throw new Error("onError callback must be a function");
+			}
 		}
 		
 		var future = new Future();
@@ -144,7 +154,8 @@
 	 * @param onError {Function}
 	 * @param [test] {Function}
 	 */
-	Future.prototype.catchError = function( onError, test ){
+	Future.prototype.catchError = function( onError, test )
+	{
 		return this.then( function(){}, function( e ){
 			if( !test || test( e ) )
 			{
@@ -159,16 +170,19 @@
 	 * @method whenComplete
 	 * @param action {Function}
 	 */
-	Future.prototype.whenComplete = function( action ){
+	Future.prototype.whenComplete = function( action )
+	{
 		return this.then(
 			function( data ){
-				action();
+				var f2 = action();
+				if ( f2 instanceof Future ) return f2.then(function(){ return data; });
 				return data;
 			}, 
-			function(e){
-				action();
+			{ onError: function(e){
+				var f2 = action();
+				if ( f2 instanceof Future ) return f2.then( function(){ throw e; });
 				throw e;
-			}
+			} }
 		);
 	};
 	
@@ -176,7 +190,8 @@
 	 * @method _complete
 	 * @private
 	 */
-	Future.prototype._complete = function( data ){
+	Future.prototype._complete = function( data )
+	{
 		if( !this._pending )
 		{
 			throw new Error("Future already completed");
@@ -192,7 +207,8 @@
 	 * @method _innerComplete
 	 * @private
 	 */
-	Future.prototype._innerComplete = function( data ){
+	Future.prototype._innerComplete = function( data )
+	{
 		var result;
 		try
 		{
@@ -220,14 +236,28 @@
 			result = this._data;
 		}
 		
-		data.f._complete( result );
+		if ( result instanceof Future )
+		{
+			result
+				.then(function( v ){
+					data.f._complete( v );
+				})
+				.catchError(function( e ){
+					data.f._completeError( e );
+				});
+		}
+		else
+		{
+			data.f._complete( result );
+		}
 	};
 	
 	/**
 	 * @method _completeError
 	 * @private
 	 */
-	Future.prototype._completeError = function( error ){
+	Future.prototype._completeError = function( error )
+	{
 		if( !this._pending )
 		{
 			throw new Error("Future already completed");
@@ -244,7 +274,8 @@
 	 * @method _dispatchCompletion
 	 * @private
 	 */
-	Future.prototype._dispatchCompletion = function(){
+	Future.prototype._dispatchCompletion = function()
+	{
 		var len = this._callbacks.length, 
 			errorHandled;
 		
@@ -263,7 +294,8 @@
 	 *	@class Completer
 	 *	@constructor
 	 */
-	var Completer = function(){ 
+	var Completer = function()
+	{ 
 		this.future = new Future();
 	};
 	
@@ -276,7 +308,8 @@
 	 * @method complete
 	 * @param data {Object}
 	 */
-	Completer.prototype.complete = function( data ){
+	Completer.prototype.complete = function( data )
+	{
 		this.future._complete( data );
 	};
 	
@@ -284,24 +317,28 @@
 	 * @method completeError
 	 * @param error {Object}
 	 */
-	Completer.prototype.completeError = function( error ){
+	Completer.prototype.completeError = function( error )
+	{
 		this.future._completeError( error );
 	};
 	
 	/**
 	 * @method isCompleted
 	 */
-	Completer.prototype.isCompleted = function(){
+	Completer.prototype.isCompleted = function()
+	{
 		return !this.future._pending;
 	};
 	
 	
 	
-	if (typeof exports !== 'undefined') {
+	if (typeof exports !== 'undefined') 
+	{
 		module.exports.Future = Future;
 		module.exports.Completer = Completer;
 	} 
-	else {
+	else 
+	{
 		root.Future = Future;
 		root.Completer = Completer;
 	}

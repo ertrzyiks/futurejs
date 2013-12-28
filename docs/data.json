@@ -1,0 +1,306 @@
+{
+    "project": {
+        "name": "Futurejs",
+        "description": "Dart Future and Completer features ported to javascript",
+        "version": "0.2.0",
+        "url": "http://ertrzyiks.github.io/futurejs"
+    },
+    "files": {
+        "future.js": {
+            "name": "future.js",
+            "modules": {},
+            "classes": {
+                "Future": 1,
+                "Completer": 1
+            },
+            "fors": {},
+            "namespaces": {}
+        }
+    },
+    "modules": {},
+    "classes": {
+        "Future": {
+            "name": "Future",
+            "shortname": "Future",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "file": "future.js",
+            "line": 11,
+            "is_constructor": 1,
+            "params": [
+                {
+                    "name": "value",
+                    "description": "",
+                    "type": "Object, Function"
+                },
+                {
+                    "name": "withError",
+                    "description": "",
+                    "type": "Boolean"
+                }
+            ]
+        },
+        "Completer": {
+            "name": "Completer",
+            "shortname": "Completer",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "file": "future.js",
+            "line": 293,
+            "is_constructor": 1
+        }
+    },
+    "classitems": [
+        {
+            "file": "future.js",
+            "line": 1,
+            "description": "Futurejs v{{VERSION}}\nhttps://github.com/ertrzyiks/futurejs\n\nDart Future and Completer features ported to javascript.",
+            "class": "Future"
+        },
+        {
+            "file": "future.js",
+            "line": 46,
+            "is_constructor": 1,
+            "params": [
+                {
+                    "name": "value",
+                    "description": "",
+                    "type": "Object"
+                }
+            ],
+            "class": "Future"
+        },
+        {
+            "file": "future.js",
+            "line": 55,
+            "is_constructor": 1,
+            "params": [
+                {
+                    "name": "value",
+                    "description": "",
+                    "type": "Function"
+                }
+            ],
+            "class": "Future"
+        },
+        {
+            "file": "future.js",
+            "line": 64,
+            "is_constructor": 1,
+            "params": [
+                {
+                    "name": "value",
+                    "description": "",
+                    "type": "Object, Function"
+                }
+            ],
+            "class": "Future"
+        },
+        {
+            "file": "future.js",
+            "line": 73,
+            "itemtype": "property",
+            "name": "_pending",
+            "type": "Boolean",
+            "access": "private",
+            "tagname": "",
+            "class": "Future"
+        },
+        {
+            "file": "future.js",
+            "line": 79,
+            "itemtype": "property",
+            "name": "_data",
+            "type": "Object",
+            "access": "private",
+            "tagname": "",
+            "class": "Future"
+        },
+        {
+            "file": "future.js",
+            "line": 85,
+            "itemtype": "property",
+            "name": "_error",
+            "type": "Object",
+            "access": "private",
+            "tagname": "",
+            "class": "Future"
+        },
+        {
+            "file": "future.js",
+            "line": 91,
+            "itemtype": "property",
+            "name": "_withError",
+            "type": "Boolean",
+            "access": "private",
+            "tagname": "",
+            "class": "Future"
+        },
+        {
+            "file": "future.js",
+            "line": 97,
+            "itemtype": "property",
+            "name": "_callbacks",
+            "type": "Array",
+            "access": "private",
+            "tagname": "",
+            "class": "Future"
+        },
+        {
+            "file": "future.js",
+            "line": 103,
+            "itemtype": "method",
+            "name": "then",
+            "params": [
+                {
+                    "name": "onValue",
+                    "description": "",
+                    "type": "Function"
+                },
+                {
+                    "name": "options",
+                    "description": "",
+                    "type": "Object",
+                    "optional": true
+                }
+            ],
+            "class": "Future"
+        },
+        {
+            "file": "future.js",
+            "line": 152,
+            "itemtype": "method",
+            "name": "catchError",
+            "params": [
+                {
+                    "name": "onError",
+                    "description": "",
+                    "type": "Function"
+                },
+                {
+                    "name": "test",
+                    "description": "",
+                    "type": "Function",
+                    "optional": true
+                }
+            ],
+            "class": "Future"
+        },
+        {
+            "file": "future.js",
+            "line": 169,
+            "itemtype": "method",
+            "name": "whenComplete",
+            "params": [
+                {
+                    "name": "action",
+                    "description": "",
+                    "type": "Function"
+                }
+            ],
+            "class": "Future"
+        },
+        {
+            "file": "future.js",
+            "line": 189,
+            "itemtype": "method",
+            "name": "_complete",
+            "access": "private",
+            "tagname": "",
+            "class": "Future"
+        },
+        {
+            "file": "future.js",
+            "line": 206,
+            "itemtype": "method",
+            "name": "_innerComplete",
+            "access": "private",
+            "tagname": "",
+            "class": "Future"
+        },
+        {
+            "file": "future.js",
+            "line": 255,
+            "itemtype": "method",
+            "name": "_completeError",
+            "access": "private",
+            "tagname": "",
+            "class": "Future"
+        },
+        {
+            "file": "future.js",
+            "line": 273,
+            "itemtype": "method",
+            "name": "_dispatchCompletion",
+            "access": "private",
+            "tagname": "",
+            "class": "Future"
+        },
+        {
+            "file": "future.js",
+            "line": 302,
+            "itemtype": "property",
+            "name": "future",
+            "class": "Completer"
+        },
+        {
+            "file": "future.js",
+            "line": 307,
+            "itemtype": "method",
+            "name": "complete",
+            "params": [
+                {
+                    "name": "data",
+                    "description": "",
+                    "type": "Object"
+                }
+            ],
+            "class": "Completer"
+        },
+        {
+            "file": "future.js",
+            "line": 316,
+            "itemtype": "method",
+            "name": "completeError",
+            "params": [
+                {
+                    "name": "error",
+                    "description": "",
+                    "type": "Object"
+                }
+            ],
+            "class": "Completer"
+        },
+        {
+            "file": "future.js",
+            "line": 325,
+            "itemtype": "method",
+            "name": "isCompleted",
+            "class": "Completer"
+        }
+    ],
+    "warnings": [
+        {
+            "message": "Missing item type\nFuturejs v{{VERSION}}\nhttps://github.com/ertrzyiks/futurejs\n\nDart Future and Completer features ported to javascript.",
+            "line": " future.js:1"
+        },
+        {
+            "message": "Missing item type",
+            "line": " future.js:46"
+        },
+        {
+            "message": "Missing item type",
+            "line": " future.js:55"
+        },
+        {
+            "message": "Missing item type",
+            "line": " future.js:64"
+        }
+    ]
+}

@@ -1,11 +1,13 @@
-Futurejs
+Future.js
 ========
 
 Dart Future and Completer feature ported to javascript for NodeJS and browser.
 
-See API reference:
+See Dart API reference:
  * [Completer](https://api.dartlang.org/docs/channels/stable/latest/dart_async/Completer.html)
  * [Future](https://api.dartlang.org/docs/channels/stable/latest/dart_async/Future.html)
+
+and compare with [API docs](http://ertrzyiks.github.io/futurejs/docs/) of this library.
 
 
 Features

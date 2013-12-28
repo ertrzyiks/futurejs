@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <link href='https://fonts.googleapis.com/css?family=Chivo:900' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print" />
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <title>Futurejs by ertrzyiks</title>
+  </head>
+
+  <body>
+    <div id="container">
+      <div class="inner">
+
+        <header>
+          <h1>Futurejs</h1>
+          <h2>Dart Future and Completer features ported to javascript.</h2>
+        </header>
+
+        <section id="downloads" class="clearfix">
+          <a href="https://github.com/ertrzyiks/futurejs/zipball/master" id="download-zip" class="button"><span>Download .zip</span></a>
+          <a href="https://github.com/ertrzyiks/futurejs/tarball/master" id="download-tar-gz" class="button"><span>Download .tar.gz</span></a>
+          <a href="https://github.com/ertrzyiks/futurejs" id="view-on-github" class="button"><span>View on GitHub</span></a>
+        </section>
+
+        <hr>
+
+        <section id="main_content">
+          <h1>
+<a name="futurejs" class="anchor" href="#futurejs"><span class="octicon octicon-link"></span></a>Futurejs</h1>
+
+<p>Dart Future and Completer feature ported to javascript for NodeJS and browser.</p>
+
+<p>See API reference:</p>
+
+<ul>
+<li><a href="https://api.dartlang.org/docs/channels/stable/latest/dart_async/Completer.html">Completer</a></li>
+<li><a href="https://api.dartlang.org/docs/channels/stable/latest/dart_async/Future.html">Future</a></li>
+</ul><h2>
+<a name="features" class="anchor" href="#features"><span class="octicon octicon-link"></span></a>Features</h2>
+
+<h4>
+<a name="apply-to-callback-architecture" class="anchor" href="#apply-to-callback-architecture"><span class="octicon octicon-link"></span></a>Apply to callback architecture</h4>
+
+<p>Completer allows you to change callbacks schema into Future flow.</p>
+
+<div class="highlight highlight-javascript"><pre><span class="cm">/**</span>
+<span class="cm"> * Example 1</span>
+<span class="cm"> * </span>
+<span class="cm"> * Change callbacks based API into Future based</span>
+<span class="cm"> */</span>
+<span class="kd">function</span> <span class="nx">asyncTask</span><span class="p">(){</span>
+  <span class="kd">var</span> <span class="nx">completer</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Completer</span><span class="p">();</span>
+
+  <span class="nx">task</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">'success'</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span> <span class="nx">data</span> <span class="p">){</span>
+    <span class="nx">completer</span><span class="p">.</span><span class="nx">complete</span><span class="p">(</span><span class="nx">data</span><span class="p">);</span>
+  <span class="p">});</span>
+
+  <span class="nx">task</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">'error'</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span> <span class="nx">e</span> <span class="p">){</span>
+    <span class="nx">completer</span><span class="p">.</span><span class="nx">completeError</span><span class="p">(</span><span class="nx">e</span><span class="p">);</span>
+  <span class="p">});</span>
+
+  <span class="k">return</span> <span class="nx">completer</span><span class="p">.</span><span class="nx">future</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+
+<h4>
+<a name="future-chaining" class="anchor" href="#future-chaining"><span class="octicon octicon-link"></span></a>Future chaining</h4>
+
+<p>With Futures you can process async task with friendly interface. No more difficult to trace callbacks tree.</p>
+
+<div class="highlight highlight-javascript"><pre><span class="cm">/**</span>
+<span class="cm"> * Example 2</span>
+<span class="cm"> * </span>
+<span class="cm"> * Load list of items and update header text.</span>
+<span class="cm"> */</span>
+<span class="kd">function</span> <span class="nx">loadData</span><span class="p">(){</span>
+  <span class="k">return</span> <span class="nx">asyncTask</span><span class="p">().</span><span class="nx">then</span><span class="p">(</span> <span class="kd">function</span><span class="p">(</span> <span class="nx">rows</span> <span class="p">){</span>
+    <span class="c1">//render table</span>
+  <span class="p">});</span>
+<span class="p">}</span>
+
+<span class="nx">loadData</span><span class="p">().</span><span class="nx">then</span><span class="p">(</span> <span class="kd">function</span><span class="p">(</span> <span class="nx">rows</span> <span class="p">){</span>
+  <span class="nx">header1</span><span class="p">.</span><span class="nx">text</span> <span class="o">=</span> <span class="s2">"Loaded "</span> <span class="o">+</span> <span class="nx">rows</span><span class="p">.</span><span class="nx">length</span> <span class="o">+</span> <span class="s2">" rows"</span><span class="p">;</span>
+<span class="p">});</span>
+
+
+</pre></div>
+
+<h4>
+<a name="data-processing" class="anchor" href="#data-processing"><span class="octicon octicon-link"></span></a>Data processing</h4>
+
+<p>It provide comfortable way to split processing of complex data.</p>
+
+<div class="highlight highlight-javascript"><pre><span class="cm">/**</span>
+<span class="cm"> * Example 3</span>
+<span class="cm"> * </span>
+<span class="cm"> * Load list of items and update header text using Future data chaining.</span>
+<span class="cm"> */</span>
+<span class="kd">function</span> <span class="nx">loadData</span><span class="p">(){</span>
+  <span class="k">return</span> <span class="nx">asyncTask</span><span class="p">().</span><span class="nx">then</span><span class="p">(</span> <span class="kd">function</span><span class="p">(</span> <span class="nx">rows</span> <span class="p">){</span>
+    <span class="c1">//render table</span>
+    <span class="k">return</span> <span class="nx">rows</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span>
+  <span class="p">});</span>
+<span class="p">}</span>
+
+<span class="nx">loadData</span><span class="p">().</span><span class="nx">then</span><span class="p">(</span> <span class="kd">function</span><span class="p">(</span> <span class="nx">rowsNum</span> <span class="p">){</span>
+  <span class="nx">header1</span><span class="p">.</span><span class="nx">text</span> <span class="o">=</span> <span class="s2">"Loaded "</span> <span class="o">+</span> <span class="nx">rowsNum</span> <span class="o">+</span> <span class="s2">" rows"</span><span class="p">;</span>
+<span class="p">});</span>
+
+
+</pre></div>
+
+<h2>
+<a name="todo" class="anchor" href="#todo"><span class="octicon octicon-link"></span></a>TODO</h2>
+
+<ul>
+<li>Future.wait() function</li>
+<li>Future.forEach() function</li>
+<li>Future.delayed() function</li>
+<li>clean callbacks array after completion</li>
+</ul>
+        </section>
+
+        <footer>
+          Futurejs is maintained by <a href="https://github.com/ertrzyiks">ertrzyiks</a><br>
+          This page was generated by <a href="http://pages.github.com">GitHub Pages</a>. Tactile theme by <a href="https://twitter.com/jasonlong">Jason Long</a>.
+        </footer>
+
+        
+      </div>
+    </div>
+  </body>
+</html>

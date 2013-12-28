@@ -1,13 +1,16 @@
 {
 	"name": "Futurejs",
+	"description": "Dart Future and Completer features ported to javascript",
 	"version": "0.2.0",
 	"author": "Mateusz Derks <mateusz.derks@gmail.com>",
+	"homepage": "http://ertrzyiks.github.io/futurejs",
 	
 	"private": true,
 	
 	"devDependencies": {
 		"mocha": "latest",
 		"grunt-text-replace": "~0.3.10",
-		"grunt-contrib-uglify": "~0.2.7"
+		"grunt-contrib-uglify": "~0.2.7",
+		"grunt-contrib-yuidoc": "latest"
 	}
 }

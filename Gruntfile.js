@@ -19,13 +19,28 @@ module.exports = function(grunt) {
 				src: 'dist/future.js',
 				dest: 'dist/future.min.js'
 			}
+		},
+		
+		yuidoc:{
+			compile: {
+				name: '<%= pkg.name %>',
+				description: '<%= pkg.description %>',
+				version: '<%= pkg.version %>',
+				url: '<%= pkg.homepage %>',
+				options: {
+					exclude: 'dist',
+					paths: './',
+					outdir: '../futurejs-gh-pages/docs/'
+				}
+			}
 		}
 	});
 
 
 grunt.loadNpmTasks('grunt-text-replace');
 grunt.loadNpmTasks('grunt-contrib-uglify');
+grunt.loadNpmTasks('grunt-contrib-yuidoc');
 
-grunt.registerTask('default', ['replace', 'uglify']);
+grunt.registerTask('default', ['replace', 'uglify', 'yuidoc']);
 
 };

@@ -29,11 +29,12 @@
             "extension_for": [],
             "file": "future.js",
             "line": 11,
+            "description": "`Future` is representation of asynchronous task.\n\nBy default creates new instance of uncompleted `Future`.\n\nWhen `value` is given, creates a completed Future with `data` equals to:\n- `value()` , when `value` is function\n- `value` , otherwise\n\nWhen `withError` parameter is passed and can be treat as true, then new object is completed with error. \nIn this case, value is used as error object.\n\nFor convenience and API compatibility there are 3 shortcuts for creating synchronous `Future`s.\n\n- `Future.value( value )`\n- `Future.sync( fn )`\n- `Future.error( e )`",
             "is_constructor": 1,
             "params": [
                 {
                     "name": "value",
-                    "description": "",
+                    "description": "Completion `data` or error object",
                     "type": "Object, Function"
                 },
                 {
@@ -52,7 +53,8 @@
             "plugin_for": [],
             "extension_for": [],
             "file": "future.js",
-            "line": 293,
+            "line": 453,
+            "description": "`Completer` represents controller of asynchronous task.",
             "is_constructor": 1
         }
     },
@@ -65,8 +67,10 @@
         },
         {
             "file": "future.js",
-            "line": 46,
-            "is_constructor": 1,
+            "line": 63,
+            "description": "Create new `Future`, synchronously completed with `value`.",
+            "itemtype": "method",
+            "name": "value",
             "params": [
                 {
                     "name": "value",
@@ -74,12 +78,19 @@
                     "type": "Object"
                 }
             ],
+            "return": {
+                "description": "",
+                "type": "Future"
+            },
+            "static": 1,
             "class": "Future"
         },
         {
             "file": "future.js",
-            "line": 55,
-            "is_constructor": 1,
+            "line": 76,
+            "description": "Create new `Future`, synchronously completed with result of `value` function.",
+            "itemtype": "method",
+            "name": "sync",
             "params": [
                 {
                     "name": "value",
@@ -87,24 +98,37 @@
                     "type": "Function"
                 }
             ],
+            "return": {
+                "description": "",
+                "type": "Future"
+            },
+            "static": 1,
             "class": "Future"
         },
         {
             "file": "future.js",
-            "line": 64,
-            "is_constructor": 1,
+            "line": 93,
+            "description": "Create new `Future`, synchronously completed with error, `value` is used as error object.",
+            "itemtype": "method",
+            "name": "error",
             "params": [
                 {
-                    "name": "value",
+                    "name": "e",
                     "description": "",
                     "type": "Object, Function"
                 }
             ],
+            "return": {
+                "description": "",
+                "type": "Future"
+            },
+            "static": 1,
             "class": "Future"
         },
         {
             "file": "future.js",
-            "line": 73,
+            "line": 106,
+            "description": "Determine if `Future` is completed (false) or not (true).",
             "itemtype": "property",
             "name": "_pending",
             "type": "Boolean",
@@ -114,7 +138,8 @@
         },
         {
             "file": "future.js",
-            "line": 79,
+            "line": 114,
+            "description": "Hold completion `data`.",
             "itemtype": "property",
             "name": "_data",
             "type": "Object",
@@ -124,7 +149,8 @@
         },
         {
             "file": "future.js",
-            "line": 85,
+            "line": 122,
+            "description": "Hold completion error object.",
             "itemtype": "property",
             "name": "_error",
             "type": "Object",
@@ -134,7 +160,8 @@
         },
         {
             "file": "future.js",
-            "line": 91,
+            "line": 130,
+            "description": "Determine if completion was with error (true) or not (false)",
             "itemtype": "property",
             "name": "_withError",
             "type": "Boolean",
@@ -144,7 +171,8 @@
         },
         {
             "file": "future.js",
-            "line": 97,
+            "line": 138,
+            "description": "Array of registered handlers for *then*, *whenComplete* and *catchError*",
             "itemtype": "property",
             "name": "_callbacks",
             "type": "Array",
@@ -154,79 +182,111 @@
         },
         {
             "file": "future.js",
-            "line": 103,
+            "line": 146,
+            "description": "Add *onValue* handler to completion of `Future`. \nIf `Future` is already completed, handler is called synchronously, \notherwise its called just after completion.\n\nThis handler can return new `data`, \n`Future` which will be chained into process or nothing to keep original value.\n\nOptionally you can pass onError callback, which is inline version  of *catchError*.\n\nAny error in *onValue* callback leads to complete result `Future` with error.",
             "itemtype": "method",
             "name": "then",
             "params": [
                 {
                     "name": "onValue",
-                    "description": "",
+                    "description": "Function which will be called after completion. It takes one parameter, completion `data`.",
                     "type": "Function"
                 },
                 {
                     "name": "options",
-                    "description": "",
+                    "description": "Map of optional parameters. Currently the only supported is { onError: {Function} }.",
                     "type": "Object",
                     "optional": true
                 }
             ],
+            "return": {
+                "description": "",
+                "type": "Future"
+            },
             "class": "Future"
         },
         {
             "file": "future.js",
-            "line": 152,
+            "line": 205,
+            "description": "Add error handler into `Future` completion chain.\n\nResult in `Future` which completes with `data` returned by handler.",
             "itemtype": "method",
             "name": "catchError",
             "params": [
                 {
                     "name": "onError",
-                    "description": "",
+                    "description": "Error handler",
                     "type": "Function"
                 },
                 {
                     "name": "test",
-                    "description": "",
+                    "description": "Callback which should return `true` if error is handler and new `data` is set for `Future`",
                     "type": "Function",
                     "optional": true
                 }
             ],
+            "return": {
+                "description": "",
+                "type": "Future"
+            },
             "class": "Future"
         },
         {
             "file": "future.js",
-            "line": 169,
+            "line": 227,
+            "description": "Add callback which is called on success or error.\n\nCallback can return `Future` to chain async task in the process.",
             "itemtype": "method",
             "name": "whenComplete",
             "params": [
                 {
                     "name": "action",
-                    "description": "",
+                    "description": "Callback",
                     "type": "Function"
                 }
             ],
+            "return": {
+                "description": "",
+                "type": "Future"
+            },
             "class": "Future"
         },
         {
             "file": "future.js",
-            "line": 189,
+            "line": 252,
+            "description": "Used by completer to control future.\n\nComplete task with data.",
             "itemtype": "method",
             "name": "_complete",
+            "params": [
+                {
+                    "name": "data",
+                    "description": "Value for completion.",
+                    "type": "Object"
+                }
+            ],
             "access": "private",
             "tagname": "",
             "class": "Future"
         },
         {
             "file": "future.js",
-            "line": 206,
+            "line": 274,
+            "description": "Update object state and trigger completion for registered callbacks.",
             "itemtype": "method",
             "name": "_innerComplete",
+            "params": [
+                {
+                    "name": "data",
+                    "description": "Setting of handler { onValue: fn, onError: fn, f: Future }",
+                    "type": "Object"
+                }
+            ],
             "access": "private",
             "tagname": "",
             "class": "Future"
         },
         {
             "file": "future.js",
-            "line": 255,
+            "line": 326,
+            "description": "Used by completer to control future.\n\nComplete task with error.",
             "itemtype": "method",
             "name": "_completeError",
             "access": "private",
@@ -235,7 +295,8 @@
         },
         {
             "file": "future.js",
-            "line": 273,
+            "line": 348,
+            "description": "Propagate completion to registered handlers.",
             "itemtype": "method",
             "name": "_dispatchCompletion",
             "access": "private",
@@ -244,14 +305,62 @@
         },
         {
             "file": "future.js",
-            "line": 302,
+            "line": 370,
+            "description": "Create `Future` when completes when all given `Future`s complete.\n\nWhen one or more input `Future`s completes with error, result `Future` result in error as well.",
+            "itemtype": "method",
+            "name": "wait",
+            "params": [
+                {
+                    "name": "list",
+                    "description": "List of `Future`s to wait for",
+                    "type": "Array"
+                }
+            ],
+            "return": {
+                "description": "Gathering object",
+                "type": "Future"
+            },
+            "static": 1,
+            "class": "Future"
+        },
+        {
+            "file": "future.js",
+            "line": 429,
+            "description": "Perform asynchronous task on list of elements.",
+            "itemtype": "method",
+            "name": "forEach",
+            "params": [
+                {
+                    "name": "list",
+                    "description": "Input for iteration",
+                    "type": "Array"
+                },
+                {
+                    "name": "fn",
+                    "description": "Function to call on each element. Should return `Future`",
+                    "type": "Function"
+                }
+            ],
+            "return": {
+                "description": "`Future` which completes when all async task complete.",
+                "type": "Future"
+            },
+            "static": 1,
+            "class": "Future"
+        },
+        {
+            "file": "future.js",
+            "line": 464,
+            "description": "`Future` object assigned to this completer",
             "itemtype": "property",
             "name": "future",
+            "type": "Future",
             "class": "Completer"
         },
         {
             "file": "future.js",
-            "line": 307,
+            "line": 471,
+            "description": "Complete assigned future with `data`.",
             "itemtype": "method",
             "name": "complete",
             "params": [
@@ -265,7 +374,8 @@
         },
         {
             "file": "future.js",
-            "line": 316,
+            "line": 482,
+            "description": "Complete assigned future with error.",
             "itemtype": "method",
             "name": "completeError",
             "params": [
@@ -279,9 +389,14 @@
         },
         {
             "file": "future.js",
-            "line": 325,
+            "line": 493,
+            "description": "Return `true` if object is completed with data or error, `false` otherwise.",
             "itemtype": "method",
             "name": "isCompleted",
+            "return": {
+                "description": "",
+                "type": "Boolean"
+            },
             "class": "Completer"
         }
     ],
@@ -289,18 +404,6 @@
         {
             "message": "Missing item type\nFuturejs v{{VERSION}}\nhttps://github.com/ertrzyiks/futurejs\n\nDart Future and Completer features ported to javascript.",
             "line": " future.js:1"
-        },
-        {
-            "message": "Missing item type",
-            "line": " future.js:46"
-        },
-        {
-            "message": "Missing item type",
-            "line": " future.js:55"
-        },
-        {
-            "message": "Missing item type",
-            "line": " future.js:64"
         }
     ]
 }

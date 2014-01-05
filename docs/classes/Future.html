@@ -104,7 +104,22 @@
 
 
 <div class="box intro">
-    
+    <p><code>Future</code> is representation of asynchronous task.</p>
+<p>By default creates new instance of uncompleted <code>Future</code>.</p>
+<p>When <code>value</code> is given, creates a completed Future with <code>data</code> equals to:</p>
+<ul>
+<li><code>value()</code> , when <code>value</code> is function</li>
+<li><code>value</code> , otherwise</li>
+</ul>
+<p>When <code>withError</code> parameter is passed and can be treat as true, then new object is completed with error. 
+In this case, value is used as error object.</p>
+<p>For convenience and API compatibility there are 3 shortcuts for creating synchronous <code>Future</code>s.</p>
+<ul>
+<li><code>Future.value( value )</code></li>
+<li><code>Future.sync( fn )</code></li>
+<li><code>Future.error( e )</code></li>
+</ul>
+
 </div>
 
 
@@ -187,7 +202,8 @@
                     
 
                     <div class="param-description">
-                         
+                        <p>Completion <code>data</code> or error object</p>
+
                     </div>
 
                     
@@ -280,8 +296,53 @@
                             </li>
                         
                             <li class="index-item method">
+                                <a href="#method_error">error</a>
+
+                                
+                                    <span class="flag static">static</span>
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method">
+                                <a href="#method_forEach">forEach</a>
+
+                                
+                                    <span class="flag static">static</span>
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method">
+                                <a href="#method_sync">sync</a>
+
+                                
+                                    <span class="flag static">static</span>
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method">
                                 <a href="#method_then">then</a>
 
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method">
+                                <a href="#method_value">value</a>
+
+                                
+                                    <span class="flag static">static</span>
+                                
+                                
+                            </li>
+                        
+                            <li class="index-item method">
+                                <a href="#method_wait">wait</a>
+
+                                
+                                    <span class="flag static">static</span>
                                 
                                 
                             </li>
@@ -356,7 +417,17 @@
     <h3 class="name"><code>_complete</code></h3>
 
     
-        <span class="paren">()</span>
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+            
+                <li class="arg">
+                    
+                        <code>data</code>
+                    
+                </li>
+            
+            </ul><span class="paren">)</span>
+        </div>
     
 
     
@@ -386,7 +457,7 @@
             
         
         
-        <a href="../files/future.js.html#l189"><code>future.js:189</code></a>
+        <a href="../files/future.js.html#l252"><code>future.js:252</code></a>
         
         </p>
 
@@ -397,9 +468,35 @@
     </div>
 
     <div class="description">
-        
+        <p>Used by completer to control future.</p>
+<p>Complete task with data.</p>
+
     </div>
 
+    
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+            
+                <li class="param">
+                    
+                        <code class="param-name">data</code>
+                        <span class="type">Object</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>Value for completion.</p>
+
+                    </div>
+
+                    
+                </li>
+            
+            </ul>
+        </div>
     
 
     
@@ -442,7 +539,7 @@
             
         
         
-        <a href="../files/future.js.html#l255"><code>future.js:255</code></a>
+        <a href="../files/future.js.html#l326"><code>future.js:326</code></a>
         
         </p>
 
@@ -453,7 +550,9 @@
     </div>
 
     <div class="description">
-        
+        <p>Used by completer to control future.</p>
+<p>Complete task with error.</p>
+
     </div>
 
     
@@ -498,7 +597,7 @@
             
         
         
-        <a href="../files/future.js.html#l273"><code>future.js:273</code></a>
+        <a href="../files/future.js.html#l348"><code>future.js:348</code></a>
         
         </p>
 
@@ -509,7 +608,8 @@
     </div>
 
     <div class="description">
-        
+        <p>Propagate completion to registered handlers.</p>
+
     </div>
 
     
@@ -524,7 +624,17 @@
     <h3 class="name"><code>_innerComplete</code></h3>
 
     
-        <span class="paren">()</span>
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+            
+                <li class="arg">
+                    
+                        <code>data</code>
+                    
+                </li>
+            
+            </ul><span class="paren">)</span>
+        </div>
     
 
     
@@ -554,7 +664,7 @@
             
         
         
-        <a href="../files/future.js.html#l206"><code>future.js:206</code></a>
+        <a href="../files/future.js.html#l274"><code>future.js:274</code></a>
         
         </p>
 
@@ -565,9 +675,34 @@
     </div>
 
     <div class="description">
-        
+        <p>Update object state and trigger completion for registered callbacks.</p>
+
     </div>
 
+    
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+            
+                <li class="param">
+                    
+                        <code class="param-name">data</code>
+                        <span class="type">Object</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>Setting of handler { onValue: fn, onError: fn, f: Future }</p>
+
+                    </div>
+
+                    
+                </li>
+            
+            </ul>
+        </div>
     
 
     
@@ -600,6 +735,10 @@
     
 
     
+        <span class="returns-inline">
+            <span class="type"><a href="../classes/Future.html" class="crosslink">Future</a></span>
+        </span>
+    
 
     
 
@@ -624,7 +763,7 @@
             
         
         
-        <a href="../files/future.js.html#l152"><code>future.js:152</code></a>
+        <a href="../files/future.js.html#l205"><code>future.js:205</code></a>
         
         </p>
 
@@ -635,7 +774,9 @@
     </div>
 
     <div class="description">
-        
+        <p>Add error handler into <code>Future</code> completion chain.</p>
+<p>Result in <code>Future</code> which completes with <code>data</code> returned by handler.</p>
+
     </div>
 
     
@@ -653,7 +794,8 @@
                     
 
                     <div class="param-description">
-                         
+                        <p>Error handler</p>
+
                     </div>
 
                     
@@ -669,6 +811,113 @@
                     
 
                     <div class="param-description">
+                        <p>Callback which should return <code>true</code> if error is handler and new <code>data</code> is set for <code>Future</code></p>
+
+                    </div>
+
+                    
+                </li>
+            
+            </ul>
+        </div>
+    
+
+    
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                
+                    
+                        <span class="type"><a href="../classes/Future.html" class="crosslink">Future</a></span>:
+                    
+                
+            </div>
+        </div>
+    
+
+    
+</div>
+
+                
+                    <div id="method_error" class="method item">
+    <h3 class="name"><code>error</code></h3>
+
+    
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+            
+                <li class="arg">
+                    
+                        <code>e</code>
+                    
+                </li>
+            
+            </ul><span class="paren">)</span>
+        </div>
+    
+
+    
+        <span class="returns-inline">
+            <span class="type"><a href="../classes/Future.html" class="crosslink">Future</a></span>
+        </span>
+    
+
+    
+
+    
+
+    
+
+    
+        <span class="flag static">static</span>
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/future.js.html#l93"><code>future.js:93</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Create new <code>Future</code>, synchronously completed with error, <code>value</code> is used as error object.</p>
+
+    </div>
+
+    
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+            
+                <li class="param">
+                    
+                        <code class="param-name">e</code>
+                        <span class="type">Object, Function</span>
+                    
+
+                    
+
+                    <div class="param-description">
                          
                     </div>
 
@@ -679,6 +928,255 @@
         </div>
     
 
+    
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                
+                    
+                        <span class="type"><a href="../classes/Future.html" class="crosslink">Future</a></span>:
+                    
+                
+            </div>
+        </div>
+    
+
+    
+</div>
+
+                
+                    <div id="method_forEach" class="method item">
+    <h3 class="name"><code>forEach</code></h3>
+
+    
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+            
+                <li class="arg">
+                    
+                        <code>list</code>
+                    
+                </li>
+            
+                <li class="arg">
+                    
+                        <code>fn</code>
+                    
+                </li>
+            
+            </ul><span class="paren">)</span>
+        </div>
+    
+
+    
+        <span class="returns-inline">
+            <span class="type"><a href="../classes/Future.html" class="crosslink">Future</a></span>
+        </span>
+    
+
+    
+
+    
+
+    
+
+    
+        <span class="flag static">static</span>
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/future.js.html#l429"><code>future.js:429</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Perform asynchronous task on list of elements.</p>
+
+    </div>
+
+    
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+            
+                <li class="param">
+                    
+                        <code class="param-name">list</code>
+                        <span class="type">Array</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>Input for iteration</p>
+
+                    </div>
+
+                    
+                </li>
+            
+                <li class="param">
+                    
+                        <code class="param-name">fn</code>
+                        <span class="type">Function</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>Function to call on each element. Should return <code>Future</code></p>
+
+                    </div>
+
+                    
+                </li>
+            
+            </ul>
+        </div>
+    
+
+    
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                
+                    
+                        <span class="type"><a href="../classes/Future.html" class="crosslink">Future</a></span>:
+                    
+                    <p><code>Future</code> which completes when all async task complete.</p>
+
+                
+            </div>
+        </div>
+    
+
+    
+</div>
+
+                
+                    <div id="method_sync" class="method item">
+    <h3 class="name"><code>sync</code></h3>
+
+    
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+            
+                <li class="arg">
+                    
+                        <code>value</code>
+                    
+                </li>
+            
+            </ul><span class="paren">)</span>
+        </div>
+    
+
+    
+        <span class="returns-inline">
+            <span class="type"><a href="../classes/Future.html" class="crosslink">Future</a></span>
+        </span>
+    
+
+    
+
+    
+
+    
+
+    
+        <span class="flag static">static</span>
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/future.js.html#l76"><code>future.js:76</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Create new <code>Future</code>, synchronously completed with result of <code>value</code> function.</p>
+
+    </div>
+
+    
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+            
+                <li class="param">
+                    
+                        <code class="param-name">value</code>
+                        <span class="type">Function</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                         
+                    </div>
+
+                    
+                </li>
+            
+            </ul>
+        </div>
+    
+
+    
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                
+                    
+                        <span class="type"><a href="../classes/Future.html" class="crosslink">Future</a></span>:
+                    
+                
+            </div>
+        </div>
     
 
     
@@ -709,6 +1207,10 @@
     
 
     
+        <span class="returns-inline">
+            <span class="type"><a href="../classes/Future.html" class="crosslink">Future</a></span>
+        </span>
+    
 
     
 
@@ -733,7 +1235,7 @@
             
         
         
-        <a href="../files/future.js.html#l103"><code>future.js:103</code></a>
+        <a href="../files/future.js.html#l146"><code>future.js:146</code></a>
         
         </p>
 
@@ -744,7 +1246,14 @@
     </div>
 
     <div class="description">
-        
+        <p>Add <em>onValue</em> handler to completion of <code>Future</code>. 
+If <code>Future</code> is already completed, handler is called synchronously, 
+otherwise its called just after completion.</p>
+<p>This handler can return new <code>data</code>, 
+<code>Future</code> which will be chained into process or nothing to keep original value.</p>
+<p>Optionally you can pass onError callback, which is inline version  of <em>catchError</em>.</p>
+<p>Any error in <em>onValue</em> callback leads to complete result <code>Future</code> with error.</p>
+
     </div>
 
     
@@ -762,7 +1271,8 @@
                     
 
                     <div class="param-description">
-                         
+                        <p>Function which will be called after completion. It takes one parameter, completion <code>data</code>.</p>
+
                     </div>
 
                     
@@ -778,6 +1288,113 @@
                     
 
                     <div class="param-description">
+                        <p>Map of optional parameters. Currently the only supported is { onError: {Function} }.</p>
+
+                    </div>
+
+                    
+                </li>
+            
+            </ul>
+        </div>
+    
+
+    
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                
+                    
+                        <span class="type"><a href="../classes/Future.html" class="crosslink">Future</a></span>:
+                    
+                
+            </div>
+        </div>
+    
+
+    
+</div>
+
+                
+                    <div id="method_value" class="method item">
+    <h3 class="name"><code>value</code></h3>
+
+    
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+            
+                <li class="arg">
+                    
+                        <code>value</code>
+                    
+                </li>
+            
+            </ul><span class="paren">)</span>
+        </div>
+    
+
+    
+        <span class="returns-inline">
+            <span class="type"><a href="../classes/Future.html" class="crosslink">Future</a></span>
+        </span>
+    
+
+    
+
+    
+
+    
+
+    
+        <span class="flag static">static</span>
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/future.js.html#l63"><code>future.js:63</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Create new <code>Future</code>, synchronously completed with <code>value</code>.</p>
+
+    </div>
+
+    
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+            
+                <li class="param">
+                    
+                        <code class="param-name">value</code>
+                        <span class="type">Object</span>
+                    
+
+                    
+
+                    <div class="param-description">
                          
                     </div>
 
@@ -788,6 +1405,128 @@
         </div>
     
 
+    
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                
+                    
+                        <span class="type"><a href="../classes/Future.html" class="crosslink">Future</a></span>:
+                    
+                
+            </div>
+        </div>
+    
+
+    
+</div>
+
+                
+                    <div id="method_wait" class="method item">
+    <h3 class="name"><code>wait</code></h3>
+
+    
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+            
+                <li class="arg">
+                    
+                        <code>list</code>
+                    
+                </li>
+            
+            </ul><span class="paren">)</span>
+        </div>
+    
+
+    
+        <span class="returns-inline">
+            <span class="type"><a href="../classes/Future.html" class="crosslink">Future</a></span>
+        </span>
+    
+
+    
+
+    
+
+    
+
+    
+        <span class="flag static">static</span>
+    
+
+    
+
+    
+
+    <div class="meta">
+        
+            
+                
+                <p>
+                
+                Defined in
+                
+            
+        
+        
+        <a href="../files/future.js.html#l370"><code>future.js:370</code></a>
+        
+        </p>
+
+
+        
+
+        
+    </div>
+
+    <div class="description">
+        <p>Create <code>Future</code> when completes when all given <code>Future</code>s complete.</p>
+<p>When one or more input <code>Future</code>s completes with error, result <code>Future</code> result in error as well.</p>
+
+    </div>
+
+    
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+            
+                <li class="param">
+                    
+                        <code class="param-name">list</code>
+                        <span class="type">Array</span>
+                    
+
+                    
+
+                    <div class="param-description">
+                        <p>List of <code>Future</code>s to wait for</p>
+
+                    </div>
+
+                    
+                </li>
+            
+            </ul>
+        </div>
+    
+
+    
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                
+                    
+                        <span class="type"><a href="../classes/Future.html" class="crosslink">Future</a></span>:
+                    
+                    <p>Gathering object</p>
+
+                
+            </div>
+        </div>
     
 
     
@@ -812,6 +1551,10 @@
     
 
     
+        <span class="returns-inline">
+            <span class="type"><a href="../classes/Future.html" class="crosslink">Future</a></span>
+        </span>
+    
 
     
 
@@ -836,7 +1579,7 @@
             
         
         
-        <a href="../files/future.js.html#l169"><code>future.js:169</code></a>
+        <a href="../files/future.js.html#l227"><code>future.js:227</code></a>
         
         </p>
 
@@ -847,7 +1590,9 @@
     </div>
 
     <div class="description">
-        
+        <p>Add callback which is called on success or error.</p>
+<p>Callback can return <code>Future</code> to chain async task in the process.</p>
+
     </div>
 
     
@@ -865,7 +1610,8 @@
                     
 
                     <div class="param-description">
-                         
+                        <p>Callback</p>
+
                     </div>
 
                     
@@ -875,6 +1621,18 @@
         </div>
     
 
+    
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                
+                    
+                        <span class="type"><a href="../classes/Future.html" class="crosslink">Future</a></span>:
+                    
+                
+            </div>
+        </div>
     
 
     
@@ -914,7 +1672,7 @@
             
         
         
-        <a href="../files/future.js.html#l97"><code>future.js:97</code></a>
+        <a href="../files/future.js.html#l138"><code>future.js:138</code></a>
         
         </p>
 
@@ -924,7 +1682,8 @@
     </div>
 
     <div class="description">
-        
+        <p>Array of registered handlers for <em>then</em>, <em>whenComplete</em> and <em>catchError</em></p>
+
     </div>
 
     
@@ -960,7 +1719,7 @@
             
         
         
-        <a href="../files/future.js.html#l79"><code>future.js:79</code></a>
+        <a href="../files/future.js.html#l114"><code>future.js:114</code></a>
         
         </p>
 
@@ -970,7 +1729,8 @@
     </div>
 
     <div class="description">
-        
+        <p>Hold completion <code>data</code>.</p>
+
     </div>
 
     
@@ -1006,7 +1766,7 @@
             
         
         
-        <a href="../files/future.js.html#l85"><code>future.js:85</code></a>
+        <a href="../files/future.js.html#l122"><code>future.js:122</code></a>
         
         </p>
 
@@ -1016,7 +1776,8 @@
     </div>
 
     <div class="description">
-        
+        <p>Hold completion error object.</p>
+
     </div>
 
     
@@ -1052,7 +1813,7 @@
             
         
         
-        <a href="../files/future.js.html#l73"><code>future.js:73</code></a>
+        <a href="../files/future.js.html#l106"><code>future.js:106</code></a>
         
         </p>
 
@@ -1062,7 +1823,8 @@
     </div>
 
     <div class="description">
-        
+        <p>Determine if <code>Future</code> is completed (false) or not (true).</p>
+
     </div>
 
     
@@ -1098,7 +1860,7 @@
             
         
         
-        <a href="../files/future.js.html#l91"><code>future.js:91</code></a>
+        <a href="../files/future.js.html#l130"><code>future.js:130</code></a>
         
         </p>
 
@@ -1108,7 +1870,8 @@
     </div>
 
     <div class="description">
-        
+        <p>Determine if completion was with error (true) or not (false)</p>
+
     </div>
 
     

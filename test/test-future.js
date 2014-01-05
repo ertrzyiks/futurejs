@@ -262,12 +262,8 @@ describe('Future', function(){
 			var completer = new Completer();
 			
 			completer.future
-				.then(function( data ){
-					assert.fail( data, "not at all", "There should be no callback there" );
-				})
-				.then(function(data){
-					assert.fail( data, "not at all", "There should be no callback there" );
-				});
+				.then(neverCalledFn)
+				.then(neverCalledFn);
 			
 			assert.throws(function(){
 				completer.completeError( new Error() );
@@ -275,20 +271,21 @@ describe('Future', function(){
 		});
 		
 		it('allow to throw exception in error handler', function( ){
-			var completer = new Completer();
+			var completer = new Completer(),
+				counter = 0;
 			
 			completer.future
-				.then(function( data ){
-					assert.fail( data, "not at all", "There should be no callback there" );
-				})
+				.then(neverCalledFn)
 				.catchError(function(e){
 					throw e;
 				})
 				.catchError(function(e){
 					//handled!
+					counter = 1;
 				});
 			assert.doesNotThrow(function(){
 				completer.completeError( new Error() );
+				assert.ok( counter );
 			});
 		});
 		
@@ -580,6 +577,142 @@ describe('Future', function(){
 					assert.strictEqual( e.message, "MyCustomError");
 					done();
 				});
+		});
+	});
+	
+	describe('#wait', function(){
+		it('return future with complete after all futures complets', function( done ){
+			function asyncTask(){
+				var completer = new Completer();
+				
+				setTimeout(function(){
+					completer.complete( 1 );
+				}, 100);
+				
+				return completer.future;
+			}
+			
+			function asyncTask2(){
+				var completer = new Completer();
+				
+				setTimeout(function(){
+					completer.complete( 2 );
+				}, 100);
+				
+				return completer.future;
+			}
+			
+			var tasks = [];
+			tasks.push( asyncTask() );
+			tasks.push( asyncTask2() );
+			
+			Future.wait(tasks)
+				.then(function( data ){
+					assert.ok( data.length );
+					assert.strictEqual( data[0], 1 );
+					assert.strictEqual( data[1], 2 );
+					done();
+				})
+				.catchError( neverCalledFn );
+		});
+		
+		it('complete with error if one of future completes with error', function( done ){
+			function asyncTask(){
+				var completer = new Completer();
+				
+				setTimeout(function(){
+					completer.complete( 1 );
+				}, 100);
+				
+				return completer.future;
+			}
+			
+			function asyncTask2(){
+				var completer = new Completer();
+				
+				setTimeout(function(){
+					completer.completeError( new Error("MyError") );
+				}, 100);
+				
+				return completer.future;
+			}
+			
+			function asyncTask3(){
+				var completer = new Completer();
+				
+				setTimeout(function(){
+					completer.completeError( new Error("MyTooLateError") );
+				}, 200);
+				
+				return completer.future;
+			}
+			
+			var tasks = [];
+			tasks.push( asyncTask() );
+			tasks.push( asyncTask2() );
+			tasks.push( asyncTask3() );
+			
+			Future.wait(tasks)
+				.then( neverCalledFn )
+				.catchError( function( e ){ 
+					assert.ok( e instanceof Error );
+					assert.strictEqual( e.message, "MyError");
+					done();
+				});
+		});
+		
+		it('empty list completes immediately', function( done ){
+				Future.wait( [] ).then( function(data){
+					assert.strictEqual( data.length, 0 );
+					done();
+				});
+		});
+		
+		it('throws error when list is not array', function( ){
+			assert.throws(function(){
+				Future.wait( 1 );
+			});
+			
+			assert.throws(function(){
+				Future.wait( "test" );
+			});
+			
+			assert.throws(function(){
+				Future.wait( true );
+			});
+		});
+		
+		it('throws error when any of element on list is not a Future', function( ){
+			assert.throws(function(){
+				Future.wait( [ 1 ] );
+			});
+		});
+	});
+	
+	
+	describe('#forEach', function(){
+		it('iterates through async tasks', function( done ){
+			
+			function asyncTask( number){
+				var completer = new Completer();
+				
+				setTimeout(function(){
+					completer.complete( number * number );
+				}, 100);
+				
+				return completer.future;
+			}
+			
+			Future.forEach([1, 2, 3], function( el ){
+				return asyncTask( el );
+			})
+			.then(function(data){
+				assert.strictEqual( data.length, 3);
+				assert.strictEqual( data[0], 1);
+				assert.strictEqual( data[1], 2*2);
+				assert.strictEqual( data[2], 3*3);
+				done();
+			});
 		});
 	});
 })

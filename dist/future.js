@@ -331,6 +331,79 @@
 	};
 	
 	
+	/**
+	 * @method wait
+	 * @static
+	 */
+	Future.wait = function( list ){
+		if( !isArray( list ) )
+		{
+			throw new Error("List of futures to wait must be an array, " + list + " given");
+		}
+		
+		if ( list.length == 0 )
+		{
+			return new Future.value([]);
+		}
+		
+		var completer = new Completer(),
+			pending = list.length,
+			data = new Array( pending );
+			
+			
+		function process(index){
+			list[index].then(function(d){
+				pending--;
+				data[index] = d;
+				
+				if ( pending <= 0 )
+				{
+					completer.complete( data );
+				}
+			})
+			.catchError(function(e){
+				if ( !completer.isCompleted() )
+				{
+					completer.completeError( e );
+				}
+			});
+		}
+		
+		for( var i = 0; i < list.length; i++ )
+		{
+			if ( list[i] instanceof Future )
+			{
+				process( i );
+			}
+			else
+			{
+				throw new Error( list[i] + " is not a Future");
+			}
+		}
+		
+		return completer.future;
+	};
+	
+	/**
+	 * @method forEach
+	 * @static
+	 */
+	Future.forEach = function( list, fn ){
+		var futures = [];
+		
+		for ( var i = 0; i < list.length; i++ ){
+			var future = fn( list[i] );
+			if ( !(future instanceof Future) )
+			{
+				throw new Error("Returned element " + list[i] + " is not a Future");
+			}
+			futures.push( future );
+		}
+		
+		return this.wait(futures);
+	};
+	
+	
 	
 	if (typeof exports !== 'undefined') 
 	{
@@ -351,6 +424,10 @@
 	function isFunction(obj) 
 	{
 		  return Object.prototype.toString.call(obj) == '[object Function]';
+	}
+	
+	function isArray(obj){
+		return Object.prototype.toString.call(obj) == '[object Array]';
 	}
 	
 })();

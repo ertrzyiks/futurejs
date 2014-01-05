@@ -85,8 +85,6 @@ loadData().then( function( rowsNum ){
 
 TODO
 ---
- - Future.wait() function
- - Future.forEach() function
  - Future.delayed() function
  - clean callbacks array after completion
 

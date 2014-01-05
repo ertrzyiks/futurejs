@@ -501,11 +501,18 @@
 		return !this.future._pending;
 	};
 	
-	if (typeof exports !== 'undefined') 
+	if ( typeof exports != 'undefined' ) 
 	{
 		module.exports.Future = Future;
 		module.exports.Completer = Completer;
-	} 
+	}
+	else if ( typeof define != 'undefined' )
+	{
+		define({
+			Future: Future,
+			Completer: Completer
+		});
+	}
 	else 
 	{
 		root.Future = Future;

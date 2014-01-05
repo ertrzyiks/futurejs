@@ -1,5 +1,5 @@
 /**
- * Futurejs v0.2.0
+ * Futurejs v0.2.1
  * https://github.com/ertrzyiks/futurejs
  *
  * Dart Future and Completer features ported to javascript.
@@ -501,11 +501,18 @@
 		return !this.future._pending;
 	};
 	
-	if (typeof exports !== 'undefined') 
+	if ( typeof exports != 'undefined' ) 
 	{
 		module.exports.Future = Future;
 		module.exports.Completer = Completer;
-	} 
+	}
+	else if ( typeof define != 'undefined' )
+	{
+		define({
+			Future: Future,
+			Completer: Completer
+		});
+	}
 	else 
 	{
 		root.Future = Future;

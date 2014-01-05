@@ -9,9 +9,26 @@
 	var root = this;
 	
 	/**
+	 * `Future` is representation of asynchronous task.
+	 *
+	 * By default creates new instance of uncompleted `Future`.
+	 *
+	 * When `value` is given, creates a completed Future with `data` equals to:
+	 * - `value()` , when `value` is function
+	 * - `value` , otherwise
+	 *
+	 * When `withError` parameter is passed and can be treat as true, then new object is completed with error. 
+	 * In this case, value is used as error object.
+	 *
+	 * For convenience and API compatibility there are 3 shortcuts for creating synchronous `Future`s.
+	 *
+	 * - `Future.value( value )`
+	 * - `Future.sync( fn )`
+	 * - `Future.error( e )`
+	 *
 	 * @class Future
 	 * @constructor
-	 * @param value {Object, Function}
+	 * @param value {Object, Function} Completion `data` or error object
 	 * @param withError {boolean}
 	 */
 	var Future = function( value, withError )
@@ -44,8 +61,12 @@
 	};
 	
 	/**
-	 * @constructor
+	 * Create new `Future`, synchronously completed with `value`.
+	 * 
+	 * @method value 
 	 * @param value {Object}
+	 * @return {Future}
+	 * @static
 	 */
 	Future.value = function( value )
 	{
@@ -53,57 +74,91 @@
 	}
 	
 	/**
-	 * @constructor
+	 * Create new `Future`, synchronously completed with result of `value` function.
+	 *
+	 * @method sync
 	 * @param value {Function}
+	 * @return {Future}
+	 * @static
 	 */
 	Future.sync = function( value )
 	{
+		if( !isFunction() )
+		{
+			throw new Error("Future.sync value should be a function");
+		}
 		return new Future( value );
 	}
 	
 	/**
-	 * @constructor
-	 * @param value {Object, Function}
+	 * Create new `Future`, synchronously completed with error, `value` is used as error object.
+	 *
+	 * @method error
+	 * @param e {Object, Function}
+	 * @return {Future}
+	 * @static
 	 */
-	Future.error = function( error )
+	Future.error = function( e )
 	{
-		return new Future( error, true );
+		return new Future( e, true );
 	}
 	
 	/**
+	 * Determine if `Future` is completed (false) or not (true).
+	 *
 	 * @property _pending {boolean}
 	 * @private
 	 */
 	Future.prototype._pending = true;
 	
 	/**
+	 * Hold completion `data`.
+	 *
 	 * @property _data {Object}
 	 * @private
 	 */
 	Future.prototype._data = null;
 	
 	/**
+	 * Hold completion error object.
+	 *
 	 * @property _error {Object}
 	 * @private
 	 */
 	Future.prototype._error = null;
 	
 	/**
+	 * Determine if completion was with error (true) or not (false)
+	 *
 	 * @property _withError {boolean}
 	 * @private
 	 */
 	Future.prototype._withError = false;
 	
 	/**
+	 * Array of registered handlers for *then*, *whenComplete* and *catchError*
+	 *
 	 * @property _callbacks {Array}
 	 * @private
 	 */
 	Future.prototype._callbacks = null;
 	
 	/**
+	 * Add *onValue* handler to completion of `Future`. 
+	 * If `Future` is already completed, handler is called synchronously, 
+	 * otherwise its called just after completion.
+	 *
+	 * This handler can return new `data`, 
+	 * `Future` which will be chained into process or nothing to keep original value.
+	 *
+	 * Optionally you can pass onError callback, which is inline version  of *catchError*.
+	 *
+	 * Any error in *onValue* callback leads to complete result `Future` with error.
+	 * 
 	 * @method then
-	 * @param onValue {Function}
-	 * @param [options] {Object}
+	 * @param onValue {Function} Function which will be called after completion. It takes one parameter, completion `data`.
+	 * @param [options] {Object} Map of optional parameters. Currently the only supported is { onError: {Function} }.
+	 * @return {Future}
 	 */
 	Future.prototype.then = function( onValue, options )
 	{
@@ -132,7 +187,6 @@
 			this._callbacks.push( { 
 				onValue: onValue,
 				onError: onError,
-				errorHandled: false,
 				f: future
 			} );
 		}
@@ -141,7 +195,6 @@
 			this._innerComplete( { 
 				onValue: onValue,
 				onError: onError,
-				errorHandled: false,
 				f: future
 			} );
 		}
@@ -150,9 +203,14 @@
 	};
 	
 	/**
+	 * Add error handler into `Future` completion chain.
+	 * 
+	 * Result in `Future` which completes with `data` returned by handler.
+	 *
 	 * @method catchError
-	 * @param onError {Function}
-	 * @param [test] {Function}
+	 * @param onError {Function} Error handler
+	 * @param [test] {Function} Callback which should return `true` if error is handler and new `data` is set for `Future`
+	 * @return {Future}
 	 */
 	Future.prototype.catchError = function( onError, test )
 	{
@@ -167,8 +225,13 @@
 	};
 	
 	/**
+	 * Add callback which is called on success or error.
+	 *
+	 * Callback can return `Future` to chain async task in the process.
+	 *
 	 * @method whenComplete
-	 * @param action {Function}
+	 * @param action {Function} Callback
+	 * @return {Future} 
 	 */
 	Future.prototype.whenComplete = function( action )
 	{
@@ -187,7 +250,12 @@
 	};
 	
 	/**
+	 * Used by completer to control future.
+	 * 
+	 * Complete task with data.
+	 *
 	 * @method _complete
+	 * @param data {Object} Value for completion.
 	 * @private
 	 */
 	Future.prototype._complete = function( data )
@@ -204,7 +272,10 @@
 	};
 	
 	/**
+	 * Update object state and trigger completion for registered callbacks.
+	 *
 	 * @method _innerComplete
+	 * @param data {Object} Setting of handler { onValue: fn, onError: fn, f: Future }
 	 * @private
 	 */
 	Future.prototype._innerComplete = function( data )
@@ -253,6 +324,10 @@
 	};
 	
 	/**
+	 * Used by completer to control future.
+	 *
+	 * Complete task with error.
+	 *
 	 * @method _completeError
 	 * @private
 	 */
@@ -271,6 +346,8 @@
 	};
 	
 	/**
+	 * Propagate completion to registered handlers.
+	 *
 	 * @method _dispatchCompletion
 	 * @private
 	 */
@@ -291,48 +368,13 @@
 	};
 	
 	/**
-	 *	@class Completer
-	 *	@constructor
-	 */
-	var Completer = function()
-	{ 
-		this.future = new Future();
-	};
-	
-	/**
-	 * @property future
-	 */
-	Completer.prototype.future = null;
-	
-	/**
-	 * @method complete
-	 * @param data {Object}
-	 */
-	Completer.prototype.complete = function( data )
-	{
-		this.future._complete( data );
-	};
-	
-	/**
-	 * @method completeError
-	 * @param error {Object}
-	 */
-	Completer.prototype.completeError = function( error )
-	{
-		this.future._completeError( error );
-	};
-	
-	/**
-	 * @method isCompleted
-	 */
-	Completer.prototype.isCompleted = function()
-	{
-		return !this.future._pending;
-	};
-	
-	
-	/**
+	 * Create `Future` when completes when all given `Future`s complete.
+	 *
+	 * When one or more input `Future`s completes with error, result `Future` result in error as well.
+	 * 
 	 * @method wait
+	 * @param list {Array} List of `Future`s to wait for
+	 * @return {Future} Gathering object
 	 * @static
 	 */
 	Future.wait = function( list ){
@@ -385,7 +427,12 @@
 	};
 	
 	/**
+	 * Perform asynchronous task on list of elements.
+	 *
 	 * @method forEach
+	 * @param list {Array} Input for iteration
+	 * @param fn {Function} Function to call on each element. Should return `Future`
+	 * @return {Future} `Future` which completes when all async task complete.
 	 * @static
 	 */
 	Future.forEach = function( list, fn ){
@@ -403,7 +450,56 @@
 		return this.wait(futures);
 	};
 	
+	/**
+	 * `Completer` represents controller of asynchronous task.
+	 * 
+	 *	@class Completer
+	 *	@constructor
+	 */
+	var Completer = function()
+	{ 
+		this.future = new Future();
+	};
 	
+	/**
+	 * `Future` object assigned to this completer
+	 *
+	 * @property future {Future}
+	 */
+	Completer.prototype.future = null;
+	
+	/**
+	 * Complete assigned future with `data`.
+	 * 
+	 * @method complete
+	 * @param data {Object}
+	 */
+	Completer.prototype.complete = function( data )
+	{
+		this.future._complete( data );
+	};
+	
+	/**
+	 * Complete assigned future with error. 
+	 *
+	 * @method completeError
+	 * @param error {Object}
+	 */
+	Completer.prototype.completeError = function( error )
+	{
+		this.future._completeError( error );
+	};
+	
+	/**
+	 * Return `true` if object is completed with data or error, `false` otherwise.
+	 *
+	 * @method isCompleted
+	 * @return {boolean}
+	 */
+	Completer.prototype.isCompleted = function()
+	{
+		return !this.future._pending;
+	};
 	
 	if (typeof exports !== 'undefined') 
 	{

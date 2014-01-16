@@ -1,5 +1,5 @@
 /**
- * Futurejs v0.2.1
+ * Futurejs v0.2.2
  * https://github.com/ertrzyiks/futurejs
  *
  * Dart Future and Completer features ported to javascript.
@@ -7,6 +7,22 @@
 (function(){
 	
 	var root = this;
+	
+	var nextTick;
+	
+	//Prefer process.nextTick, than timeout on nodejs
+	if ( typeof(process) != "undefined" && isFunction(process.nextTick))
+	{
+		nextTick = function( cb ){
+			process.nextTick(cb);
+		};
+	}
+	else
+	{
+		nextTick = function( cb ){
+			setTimeout(cb, 0);
+		};
+	}
 	
 	/**
 	 * `Future` is representation of asynchronous task.
@@ -28,8 +44,8 @@
 	 *
 	 * @class Future
 	 * @constructor
-	 * @param value {Object, Function} Completion `data` or error object
-	 * @param withError {boolean}
+	 * @param {Object|Function} [value] Completion `data` or error object
+	 * @param {boolean} [withError] 
 	 */
 	var Future = function( value, withError )
 	{ 
@@ -64,7 +80,7 @@
 	 * Create new `Future`, synchronously completed with `value`.
 	 * 
 	 * @method value 
-	 * @param value {Object}
+	 * @param {Object} value
 	 * @return {Future}
 	 * @static
 	 */
@@ -77,13 +93,13 @@
 	 * Create new `Future`, synchronously completed with result of `value` function.
 	 *
 	 * @method sync
-	 * @param value {Function}
+	 * @param {Function} value
 	 * @return {Future}
 	 * @static
 	 */
 	Future.sync = function( value )
 	{
-		if( !isFunction() )
+		if( !isFunction( value ) )
 		{
 			throw new Error("Future.sync value should be a function");
 		}
@@ -94,7 +110,7 @@
 	 * Create new `Future`, synchronously completed with error, `value` is used as error object.
 	 *
 	 * @method error
-	 * @param e {Object, Function}
+	 * @param {Object|Function} e
 	 * @return {Future}
 	 * @static
 	 */
@@ -106,7 +122,7 @@
 	/**
 	 * Determine if `Future` is completed (false) or not (true).
 	 *
-	 * @property _pending {boolean}
+	 * @property {Boolean} _pending
 	 * @private
 	 */
 	Future.prototype._pending = true;
@@ -114,7 +130,7 @@
 	/**
 	 * Hold completion `data`.
 	 *
-	 * @property _data {Object}
+	 * @property {Object} _data
 	 * @private
 	 */
 	Future.prototype._data = null;
@@ -122,7 +138,7 @@
 	/**
 	 * Hold completion error object.
 	 *
-	 * @property _error {Object}
+	 * @property {Object} _error
 	 * @private
 	 */
 	Future.prototype._error = null;
@@ -130,7 +146,7 @@
 	/**
 	 * Determine if completion was with error (true) or not (false)
 	 *
-	 * @property _withError {boolean}
+	 * @property {Boolean} _withError
 	 * @private
 	 */
 	Future.prototype._withError = false;
@@ -138,7 +154,7 @@
 	/**
 	 * Array of registered handlers for *then*, *whenComplete* and *catchError*
 	 *
-	 * @property _callbacks {Array}
+	 * @property {Array} _callbacks
 	 * @private
 	 */
 	Future.prototype._callbacks = null;
@@ -156,8 +172,8 @@
 	 * Any error in *onValue* callback leads to complete result `Future` with error.
 	 * 
 	 * @method then
-	 * @param onValue {Function} Function which will be called after completion. It takes one parameter, completion `data`.
-	 * @param [options] {Object} Map of optional parameters. Currently the only supported is { onError: {Function} }.
+	 * @param {Function} onValue Function which will be called after completion. It takes one parameter, completion `data`.
+	 * @param {Object} [options] Map of optional parameters. Currently the only supported is { onError: {Function} }.
 	 * @return {Future}
 	 */
 	Future.prototype.then = function( onValue, options )
@@ -196,7 +212,7 @@
 				onValue: onValue,
 				onError: onError,
 				f: future
-			} );
+			}, true);
 		}
 		
 		return future;
@@ -208,8 +224,8 @@
 	 * Result in `Future` which completes with `data` returned by handler.
 	 *
 	 * @method catchError
-	 * @param onError {Function} Error handler
-	 * @param [test] {Function} Callback which should return `true` if error is handler and new `data` is set for `Future`
+	 * @param {Function} onError Error handler
+	 * @param {Function} [test] Callback which should return `true` if error is handler and new `data` is set for `Future`
 	 * @return {Future}
 	 */
 	Future.prototype.catchError = function( onError, test )
@@ -230,7 +246,7 @@
 	 * Callback can return `Future` to chain async task in the process.
 	 *
 	 * @method whenComplete
-	 * @param action {Function} Callback
+	 * @param {Function} action Callback
 	 * @return {Future} 
 	 */
 	Future.prototype.whenComplete = function( action )
@@ -255,10 +271,11 @@
 	 * Complete task with data.
 	 *
 	 * @method _complete
-	 * @param data {Object} Value for completion.
+	 * @param {Object} data Value for completion.
+	 * @param {Boolean} [sync] Determine if future was completed in sync mode
 	 * @private
 	 */
-	Future.prototype._complete = function( data )
+	Future.prototype._complete = function( data, sync )
 	{
 		if( !this._pending )
 		{
@@ -268,17 +285,18 @@
 		this._pending = false;
 		this._data = data;
 		
-		this._dispatchCompletion();
+		this._dispatchCompletion( sync );
 	};
 	
 	/**
 	 * Update object state and trigger completion for registered callbacks.
 	 *
 	 * @method _innerComplete
-	 * @param data {Object} Setting of handler { onValue: fn, onError: fn, f: Future }
+	 * @param {Object} data Setting of handler { onValue: fn, onError: fn, f: Future }
+	 * @param {Boolean} [sync] Determine if future was completed in sync mode
 	 * @private
 	 */
-	Future.prototype._innerComplete = function( data )
+	Future.prototype._innerComplete = function( data, sync )
 	{
 		var result;
 		try
@@ -298,7 +316,7 @@
 		}
 		catch( e )
 		{
-			data.f._completeError( e );
+			data.f._completeError( e ,sync );
 			return;
 		}
 		
@@ -319,7 +337,7 @@
 		}
 		else
 		{
-			data.f._complete( result );
+			data.f._complete( result, sync );
 		}
 	};
 	
@@ -329,9 +347,11 @@
 	 * Complete task with error.
 	 *
 	 * @method _completeError
+	 * @param {Object} error Error object.
+	 * @param {Boolean} [sync] Determine if future was completed in sync mode
 	 * @private
 	 */
-	Future.prototype._completeError = function( error )
+	Future.prototype._completeError = function( error, sync )
 	{
 		if( !this._pending )
 		{
@@ -342,19 +362,44 @@
 		this._withError = true;
 		this._error = error;
 		
-		this._dispatchCompletion();
+		this._dispatchCompletion( sync );
+	};
+	
+	/**
+	 * Prepare for propagate completion to registered handlers. Decide which mode it should go:
+	 * 
+	 * normal, for sync != true
+	 * fake-async, for sync == true
+	 *
+	 * @method _dispatchCompletion
+	 * @param {Boolean} [sync] Determine if future was completed in sync mode
+	 * @private
+	 */
+	Future.prototype._dispatchCompletion = function( sync )
+	{
+		if ( sync )
+		{
+			var self = this;
+			self._pending = true;
+			nextTick(function(){
+				self._pending = false;
+				self._actualDispatchCompletion( );
+			});
+		}
+		else
+		{
+			this._actualDispatchCompletion();
+		}
 	};
 	
 	/**
 	 * Propagate completion to registered handlers.
 	 *
-	 * @method _dispatchCompletion
+	 * @method _actualDispatchCompletion
 	 * @private
 	 */
-	Future.prototype._dispatchCompletion = function()
-	{
-		var len = this._callbacks.length, 
-			errorHandled;
+	Future.prototype._actualDispatchCompletion = function(){
+		var len = this._callbacks.length;
 		
 		if ( this._withError && len == 0 )
 		{
@@ -373,7 +418,7 @@
 	 * When one or more input `Future`s completes with error, result `Future` result in error as well.
 	 * 
 	 * @method wait
-	 * @param list {Array} List of `Future`s to wait for
+	 * @param {Array} list List of `Future`s to wait for
 	 * @return {Future} Gathering object
 	 * @static
 	 */
@@ -430,8 +475,8 @@
 	 * Perform asynchronous task on list of elements.
 	 *
 	 * @method forEach
-	 * @param list {Array} Input for iteration
-	 * @param fn {Function} Function to call on each element. Should return `Future`
+	 * @param {Array} list Input for iteration
+	 * @param {Function} fn Function to call on each element. Should return `Future`
 	 * @return {Future} `Future` which completes when all async task complete.
 	 * @static
 	 */
@@ -464,7 +509,7 @@
 	/**
 	 * `Future` object assigned to this completer
 	 *
-	 * @property future {Future}
+	 * @property {Future} future
 	 */
 	Completer.prototype.future = null;
 	
@@ -472,7 +517,7 @@
 	 * Complete assigned future with `data`.
 	 * 
 	 * @method complete
-	 * @param data {Object}
+	 * @param {Object} data
 	 */
 	Completer.prototype.complete = function( data )
 	{
@@ -483,7 +528,7 @@
 	 * Complete assigned future with error. 
 	 *
 	 * @method completeError
-	 * @param error {Object}
+	 * @param {Object} error
 	 */
 	Completer.prototype.completeError = function( error )
 	{
@@ -494,7 +539,7 @@
 	 * Return `true` if object is completed with data or error, `false` otherwise.
 	 *
 	 * @method isCompleted
-	 * @return {boolean}
+	 * @return {Boolean}
 	 */
 	Completer.prototype.isCompleted = function()
 	{

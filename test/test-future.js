@@ -349,24 +349,53 @@ describe('Future', function(){
 				done();
 			});
 		});
+		
+		
+		it('allow to catch error from `then`', function( done ){
+			var counter = 0;
+						
+			function asyncTask(){
+				var completer = new Completer();
+				
+				setTimeout(function(){
+					completer.complete( 1 );
+				}, 100);
+				
+				return completer.future;
+			}
+			
+			function next(){
+				assert.strictEqual( 1, counter );
+				done();
+			}
+			asyncTask()
+				.then(function(){ throw "an error"; })
+				.catchError(function(){ counter++; next();});
+		});
+		
+		it('allow to catch error from `then` sync', function( done ){
+			Future.value(1)
+				.then(function(){ throw "an error"; })
+				.catchError(function(){ done(); });
+		});
 	});
 	
 	
 	describe('#future-sync', function(){
 		it('allow to create sync futures with value', function( ){
-			new Future.value( 5 ).then(function( data ){
+			Future.value( 5 ).then(function( data ){
 				assert.strictEqual( 5, data );
 			});
 		});
 		
 		it('allow to create sync futures with function', function( ){
-			new Future.sync( function(){ return 5; } ).then(function( data ){
+			Future.sync( function(){ return 5; } ).then(function( data ){
 				assert.strictEqual( 5, data );
 			});
 		});
 		
 		it('allow to create sync futures with error', function( ){
-			new Future.error( new Error() ).catchError(function( e ){
+			Future.error( new Error() ).catchError(function( e ){
 				assert.ok( e instanceof Error );
 			});
 		});
@@ -686,6 +715,39 @@ describe('Future', function(){
 			assert.throws(function(){
 				Future.wait( [ 1 ] );
 			});
+		});
+		
+		it('throws error if completer throws error', function( done ){
+			function asyncTask( number){
+				var completer = new Completer();
+				
+				setTimeout(function(){
+					completer.complete( number * number );
+				}, 100);
+				
+				return completer.future;
+			}
+			
+			var counter = 0,
+				future1 = Future.wait( [ asyncTask() ] );
+			
+			Future.wait( [ future1 ] )
+				.then(function(){ throw "an error"; })
+				.catchError(function(){ 
+					counter++; 
+					assert.strictEqual( 1, counter ); 
+					done();
+				});
+		});
+		
+		it('throws error if completer throws error in sync', function( done ){
+			var future1 = Future.wait( [ Future.value(1) ] );
+			
+			Future.wait( [ future1 ] )
+				.then(function(){ throw "an error"; })
+				.catchError(function(){ 
+					done();
+				});
 		});
 	});
 	

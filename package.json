@@ -1,7 +1,7 @@
 {
 	"name": "Futurejs",
 	"description": "Dart Future and Completer features ported to javascript",
-	"version": "0.2.1",
+	"version": "0.2.2",
 	"author": "Mateusz Derks <mateusz.derks@gmail.com>",
 	"homepage": "http://ertrzyiks.github.io/futurejs",
 	

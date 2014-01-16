@@ -19,7 +19,7 @@
             
         </div>
         <div class="yui3-u-1-4 version">
-            <em>API Docs for: 0.2.0</em>
+            <em>API Docs for: 0.2.2</em>
         </div>
     </div>
     <div id="bd" class="yui3-g">
@@ -98,6 +98,22 @@
 	
 	var root = this;
 	
+	var nextTick;
+	
+	//Prefer process.nextTick, than timeout on nodejs
+	if ( typeof(process) != &quot;undefined&quot; &amp;&amp; isFunction(process.nextTick))
+	{
+		nextTick = function( cb ){
+			process.nextTick(cb);
+		};
+	}
+	else
+	{
+		nextTick = function( cb ){
+			setTimeout(cb, 0);
+		};
+	}
+	
 	/**
 	 * &#x60;Future&#x60; is representation of asynchronous task.
 	 *
@@ -118,8 +134,8 @@
 	 *
 	 * @class Future
 	 * @constructor
-	 * @param value {Object, Function} Completion &#x60;data&#x60; or error object
-	 * @param withError {boolean}
+	 * @param {Object|Function} [value] Completion &#x60;data&#x60; or error object
+	 * @param {boolean} [withError] 
 	 */
 	var Future = function( value, withError )
 	{ 
@@ -154,7 +170,7 @@
 	 * Create new &#x60;Future&#x60;, synchronously completed with &#x60;value&#x60;.
 	 * 
 	 * @method value 
-	 * @param value {Object}
+	 * @param {Object} value
 	 * @return {Future}
 	 * @static
 	 */
@@ -167,13 +183,13 @@
 	 * Create new &#x60;Future&#x60;, synchronously completed with result of &#x60;value&#x60; function.
 	 *
 	 * @method sync
-	 * @param value {Function}
+	 * @param {Function} value
 	 * @return {Future}
 	 * @static
 	 */
 	Future.sync = function( value )
 	{
-		if( !isFunction() )
+		if( !isFunction( value ) )
 		{
 			throw new Error(&quot;Future.sync value should be a function&quot;);
 		}
@@ -184,7 +200,7 @@
 	 * Create new &#x60;Future&#x60;, synchronously completed with error, &#x60;value&#x60; is used as error object.
 	 *
 	 * @method error
-	 * @param e {Object, Function}
+	 * @param {Object|Function} e
 	 * @return {Future}
 	 * @static
 	 */
@@ -196,7 +212,7 @@
 	/**
 	 * Determine if &#x60;Future&#x60; is completed (false) or not (true).
 	 *
-	 * @property _pending {boolean}
+	 * @property {Boolean} _pending
 	 * @private
 	 */
 	Future.prototype._pending = true;
@@ -204,7 +220,7 @@
 	/**
 	 * Hold completion &#x60;data&#x60;.
 	 *
-	 * @property _data {Object}
+	 * @property {Object} _data
 	 * @private
 	 */
 	Future.prototype._data = null;
@@ -212,7 +228,7 @@
 	/**
 	 * Hold completion error object.
 	 *
-	 * @property _error {Object}
+	 * @property {Object} _error
 	 * @private
 	 */
 	Future.prototype._error = null;
@@ -220,7 +236,7 @@
 	/**
 	 * Determine if completion was with error (true) or not (false)
 	 *
-	 * @property _withError {boolean}
+	 * @property {Boolean} _withError
 	 * @private
 	 */
 	Future.prototype._withError = false;
@@ -228,7 +244,7 @@
 	/**
 	 * Array of registered handlers for *then*, *whenComplete* and *catchError*
 	 *
-	 * @property _callbacks {Array}
+	 * @property {Array} _callbacks
 	 * @private
 	 */
 	Future.prototype._callbacks = null;
@@ -246,8 +262,8 @@
 	 * Any error in *onValue* callback leads to complete result &#x60;Future&#x60; with error.
 	 * 
 	 * @method then
-	 * @param onValue {Function} Function which will be called after completion. It takes one parameter, completion &#x60;data&#x60;.
-	 * @param [options] {Object} Map of optional parameters. Currently the only supported is { onError: {Function} }.
+	 * @param {Function} onValue Function which will be called after completion. It takes one parameter, completion &#x60;data&#x60;.
+	 * @param {Object} [options] Map of optional parameters. Currently the only supported is { onError: {Function} }.
 	 * @return {Future}
 	 */
 	Future.prototype.then = function( onValue, options )
@@ -286,7 +302,7 @@
 				onValue: onValue,
 				onError: onError,
 				f: future
-			} );
+			}, true);
 		}
 		
 		return future;
@@ -298,8 +314,8 @@
 	 * Result in &#x60;Future&#x60; which completes with &#x60;data&#x60; returned by handler.
 	 *
 	 * @method catchError
-	 * @param onError {Function} Error handler
-	 * @param [test] {Function} Callback which should return &#x60;true&#x60; if error is handler and new &#x60;data&#x60; is set for &#x60;Future&#x60;
+	 * @param {Function} onError Error handler
+	 * @param {Function} [test] Callback which should return &#x60;true&#x60; if error is handler and new &#x60;data&#x60; is set for &#x60;Future&#x60;
 	 * @return {Future}
 	 */
 	Future.prototype.catchError = function( onError, test )
@@ -320,7 +336,7 @@
 	 * Callback can return &#x60;Future&#x60; to chain async task in the process.
 	 *
 	 * @method whenComplete
-	 * @param action {Function} Callback
+	 * @param {Function} action Callback
 	 * @return {Future} 
 	 */
 	Future.prototype.whenComplete = function( action )
@@ -345,10 +361,11 @@
 	 * Complete task with data.
 	 *
 	 * @method _complete
-	 * @param data {Object} Value for completion.
+	 * @param {Object} data Value for completion.
+	 * @param {Boolean} [sync] Determine if future was completed in sync mode
 	 * @private
 	 */
-	Future.prototype._complete = function( data )
+	Future.prototype._complete = function( data, sync )
 	{
 		if( !this._pending )
 		{
@@ -358,17 +375,18 @@
 		this._pending = false;
 		this._data = data;
 		
-		this._dispatchCompletion();
+		this._dispatchCompletion( sync );
 	};
 	
 	/**
 	 * Update object state and trigger completion for registered callbacks.
 	 *
 	 * @method _innerComplete
-	 * @param data {Object} Setting of handler { onValue: fn, onError: fn, f: Future }
+	 * @param {Object} data Setting of handler { onValue: fn, onError: fn, f: Future }
+	 * @param {Boolean} [sync] Determine if future was completed in sync mode
 	 * @private
 	 */
-	Future.prototype._innerComplete = function( data )
+	Future.prototype._innerComplete = function( data, sync )
 	{
 		var result;
 		try
@@ -388,7 +406,7 @@
 		}
 		catch( e )
 		{
-			data.f._completeError( e );
+			data.f._completeError( e ,sync );
 			return;
 		}
 		
@@ -409,7 +427,7 @@
 		}
 		else
 		{
-			data.f._complete( result );
+			data.f._complete( result, sync );
 		}
 	};
 	
@@ -419,9 +437,11 @@
 	 * Complete task with error.
 	 *
 	 * @method _completeError
+	 * @param {Object} error Error object.
+	 * @param {Boolean} [sync] Determine if future was completed in sync mode
 	 * @private
 	 */
-	Future.prototype._completeError = function( error )
+	Future.prototype._completeError = function( error, sync )
 	{
 		if( !this._pending )
 		{
@@ -432,19 +452,44 @@
 		this._withError = true;
 		this._error = error;
 		
-		this._dispatchCompletion();
+		this._dispatchCompletion( sync );
+	};
+	
+	/**
+	 * Prepare for propagate completion to registered handlers. Decide which mode it should go:
+	 * 
+	 * normal, for sync != true
+	 * fake-async, for sync == true
+	 *
+	 * @method _dispatchCompletion
+	 * @param {Boolean} [sync] Determine if future was completed in sync mode
+	 * @private
+	 */
+	Future.prototype._dispatchCompletion = function( sync )
+	{
+		if ( sync )
+		{
+			var self = this;
+			self._pending = true;
+			nextTick(function(){
+				self._pending = false;
+				self._actualDispatchCompletion( );
+			});
+		}
+		else
+		{
+			this._actualDispatchCompletion();
+		}
 	};
 	
 	/**
 	 * Propagate completion to registered handlers.
 	 *
-	 * @method _dispatchCompletion
+	 * @method _actualDispatchCompletion
 	 * @private
 	 */
-	Future.prototype._dispatchCompletion = function()
-	{
-		var len = this._callbacks.length, 
-			errorHandled;
+	Future.prototype._actualDispatchCompletion = function(){
+		var len = this._callbacks.length;
 		
 		if ( this._withError &amp;&amp; len == 0 )
 		{
@@ -463,7 +508,7 @@
 	 * When one or more input &#x60;Future&#x60;s completes with error, result &#x60;Future&#x60; result in error as well.
 	 * 
 	 * @method wait
-	 * @param list {Array} List of &#x60;Future&#x60;s to wait for
+	 * @param {Array} list List of &#x60;Future&#x60;s to wait for
 	 * @return {Future} Gathering object
 	 * @static
 	 */
@@ -520,8 +565,8 @@
 	 * Perform asynchronous task on list of elements.
 	 *
 	 * @method forEach
-	 * @param list {Array} Input for iteration
-	 * @param fn {Function} Function to call on each element. Should return &#x60;Future&#x60;
+	 * @param {Array} list Input for iteration
+	 * @param {Function} fn Function to call on each element. Should return &#x60;Future&#x60;
 	 * @return {Future} &#x60;Future&#x60; which completes when all async task complete.
 	 * @static
 	 */
@@ -554,7 +599,7 @@
 	/**
 	 * &#x60;Future&#x60; object assigned to this completer
 	 *
-	 * @property future {Future}
+	 * @property {Future} future
 	 */
 	Completer.prototype.future = null;
 	
@@ -562,7 +607,7 @@
 	 * Complete assigned future with &#x60;data&#x60;.
 	 * 
 	 * @method complete
-	 * @param data {Object}
+	 * @param {Object} data
 	 */
 	Completer.prototype.complete = function( data )
 	{
@@ -573,7 +618,7 @@
 	 * Complete assigned future with error. 
 	 *
 	 * @method completeError
-	 * @param error {Object}
+	 * @param {Object} error
 	 */
 	Completer.prototype.completeError = function( error )
 	{
@@ -584,18 +629,25 @@
 	 * Return &#x60;true&#x60; if object is completed with data or error, &#x60;false&#x60; otherwise.
 	 *
 	 * @method isCompleted
-	 * @return {boolean}
+	 * @return {Boolean}
 	 */
 	Completer.prototype.isCompleted = function()
 	{
 		return !this.future._pending;
 	};
 	
-	if (typeof exports !== &#x27;undefined&#x27;) 
+	if ( typeof exports != &#x27;undefined&#x27; ) 
 	{
 		module.exports.Future = Future;
 		module.exports.Completer = Completer;
-	} 
+	}
+	else if ( typeof define != &#x27;undefined&#x27; )
+	{
+		define({
+			Future: Future,
+			Completer: Completer
+		});
+	}
 	else 
 	{
 		root.Future = Future;

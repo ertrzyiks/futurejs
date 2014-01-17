@@ -13,9 +13,7 @@
 	//Prefer process.nextTick, than timeout on nodejs
 	if ( typeof(process) != "undefined" && isFunction(process.nextTick))
 	{
-		nextTick = function( cb ){
-			process.nextTick(cb);
-		};
+		nextTick = process.nextTick;
 	}
 	else
 	{
@@ -447,25 +445,26 @@
 				{
 					completer.complete( data );
 				}
-			})
-			.catchError(function(e){
+			}, { onError: function(e){
 				if ( !completer.isCompleted() )
 				{
 					completer.completeError( e );
 				}
-			});
+			} });
 		}
 		
 		for( var i = 0; i < list.length; i++ )
 		{
-			if ( list[i] instanceof Future )
-			{
-				process( i );
-			}
-			else
+			if ( !( list[i] instanceof Future ) )
 			{
 				throw new Error( list[i] + " is not a Future");
 			}
+		}
+		
+		for( var i = 0; i < list.length; i++ )
+		{
+			process( i );
+
 		}
 		
 		return completer.future;
